@@ -16,6 +16,21 @@ class Instructor(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     courses = db.relationship('Course', backref='instructor', lazy=True)
+    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender_instructor', lazy=True)
+    received_messages = db.relationship('Message', foreign_keys='Message.recipient_id', backref='recipient_instructor', lazy=True)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "profile_picture": self.profile_picture,
+            "bio": self.bio,
+            "verified": self.verified,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "user_type": "instructor" 
+        }
 
 
 class Learner(db.Model, SerializerMixin):
@@ -30,8 +45,19 @@ class Learner(db.Model, SerializerMixin):
 
     enrollments = db.relationship('Enrollment', backref='learner', lazy=True)
     reviews = db.relationship('Review', backref='learner', lazy=True)
-    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
-    received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
+    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender_learner', lazy=True)
+    received_messages = db.relationship('Message', foreign_keys='Message.recipient_id', backref='recipient_learner', lazy=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "profile_picture": self.profile_picture,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "user_type": "learner"
+        }
 
 
 class Course(db.Model, SerializerMixin):
@@ -91,14 +117,26 @@ class Review(db.Model, SerializerMixin):
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
 
-
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('learners.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('learners.id'), nullable=False)
-    content = db.Column(db.Text)
-    sent_at = db.Column(db.TIMESTAMP, default=get_eat_now)
+
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, nullable=False)  # Can be either Learner or Instructor ID
+    recipient_id = db.Column(db.Integer, nullable=False)  # Can be either Learner or Instructor ID
+    content = db.Column(db.Text, nullable=False)
+    sent_at = db.Column(db.DateTime, default=db.func.now())
+
+    def __repr__(self):
+        return f"<Message {self.id}: from {self.sender_id} to {self.recipient_id}>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "sender_id": self.sender_id,
+            "recipient_id": self.recipient_id,
+            "content": self.content,
+            "sent_at": self.sent_at.isoformat()
+        }
 
 
 class Accolade(db.Model, SerializerMixin):

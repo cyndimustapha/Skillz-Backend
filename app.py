@@ -4,6 +4,11 @@ from sqlalchemy_serializer import SerializerMixin
 from flask_migrate import Migrate
 from datetime import datetime
 import pytz
+from Resources import (
+    InstructorResource, LearnerResource, CourseResource, 
+    CourseContentResource, PaymentResource, EnrollmentResource, 
+    ReviewResource, MessageResource, AccoladeResource
+)
 
 
 app = Flask(__name__)
@@ -21,6 +26,9 @@ def get_eat_now():
     return datetime.now(EAT)
 
 from models import User, Course, CourseContent, Payment, Enrollment, Review, Message, Accolade
+
+# Registering Resources
+api.add_resource(MessageResource, '/messages', '/messages/<int:message_id>')
 
 if __name__ == '__main__':
     app.run(debug=True)
