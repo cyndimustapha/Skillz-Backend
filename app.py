@@ -1,4 +1,5 @@
 
+
 from flask import Flask, jsonify, make_response,request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
@@ -32,6 +33,7 @@ app.config['MAIL_DEFAULT_SENDER'] = 'your-email@example.com'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
 db.init_app(app)
 mail = Mail(app)
 
@@ -64,6 +66,7 @@ def handle_preflight():
 with app.app_context():
     db.create_all()
 
+
 # Define East African Time timezone
 EAT = pytz.timezone('Africa/Nairobi')
 
@@ -74,5 +77,4 @@ from models import User, Course, CourseContent, Payment, Enrollment, Review, Mes
 
 if __name__ == '__main__':
     app.run(debug=True)
-
 
