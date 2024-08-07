@@ -103,3 +103,4 @@ class Accolade(db.Model, SerializerMixin):
     enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id'), nullable=False)
     accolade_type = db.Column(db.String(100))
     awarded_at = db.Column(db.TIMESTAMP, default=get_eat_now)
+
