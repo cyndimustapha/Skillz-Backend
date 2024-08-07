@@ -18,7 +18,7 @@ class User(db.Model, SerializerMixin):
 
     courses = db.relationship('Course', backref='user', lazy=True)
     enrollments = db.relationship('Enrollment', backref='user', lazy=True)
-    reviews = db.relationship('Review', backref='user', lazy=True
+    reviews = db.relationship('Review', backref='user', lazy=True)
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
     received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
     payments = db.relationship('Payment', backref='learner', lazy=True)
