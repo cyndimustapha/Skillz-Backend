@@ -1,4 +1,5 @@
 
+
 from flask import Flask, jsonify, make_response,request
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -27,6 +28,7 @@ app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'your-email@example.com'
 app.config['MAIL_PASSWORD'] = 'your-email-password'
 app.config['MAIL_DEFAULT_SENDER'] = 'your-email@example.com'
+
 
 db.init_app(app)
 mail = Mail(app)
@@ -61,9 +63,7 @@ def handle_preflight():
 with app.app_context():
     db.create_all()
 
-# from models import User, Course, CourseContent, Payment, Enrollment, Review, Message, Accolade
 
 if __name__ == '__main__':
     app.run(debug=True)
-
 
