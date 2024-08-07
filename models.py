@@ -1,7 +1,21 @@
 from datetime import datetime
 import pytz
-from app import db, get_eat_now
 from sqlalchemy_serializer import SerializerMixin
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
+
+metadata = MetaData
+
+db = SQLAlchemy(metadata=metadata)
+
+# Define East African Time timezone
+EAT = pytz.timezone('Africa/Nairobi')
+
+def get_eat_now():
+    return datetime.now(EAT)
+
+eat = get_eat_now()
+
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -13,8 +27,8 @@ class User(db.Model, SerializerMixin):
     profile_picture = db.Column(db.String(255))
     bio = db.Column(db.Text)
     verified = db.Column(db.Boolean)
-    created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
-    updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
+    created_at = db.Column(db.TIMESTAMP, default=eat)
+    updated_at = db.Column(db.TIMESTAMP, default=eat, onupdate=eat)
 
     courses = db.relationship('Course', backref='user', lazy=True)
     enrollments = db.relationship('Enrollment', backref='user', lazy=True)
@@ -91,4 +105,3 @@ class Accolade(db.Model, SerializerMixin):
     enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id'), nullable=False)
     accolade_type = db.Column(db.String(100))
     awarded_at = db.Column(db.TIMESTAMP, default=get_eat_now)
-
