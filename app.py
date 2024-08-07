@@ -1,3 +1,4 @@
+
 from flask import Flask, jsonify, make_response, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,6 +8,9 @@ import pytz
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_cors import CORS
+
+
+from models import db
 
 app = Flask(__name__)
 
@@ -24,9 +28,10 @@ app.config['MAIL_PASSWORD'] = 'your-email-password'
 app.config['MAIL_DEFAULT_SENDER'] = 'your-email@example.com'
 
 # Initialize extensions
-db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 jwt_manager = JWTManager(app)
+
+db.init_app(app)
 mail = Mail(app)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
@@ -59,6 +64,7 @@ api.add_resource(CourseContentResource, '/coursecontent')
 # api.add_resource(EnrollmentResource, '/enrollments')
 # api.add_resource(ReviewResource, '/reviews')
 # api.add_resource(AccoladeResource, '/accolades')
+
 
 @app.before_request
 def handle_preflight():
