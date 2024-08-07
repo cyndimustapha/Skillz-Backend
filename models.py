@@ -34,7 +34,7 @@ class User(db.Model, SerializerMixin):
     enrollments = db.relationship('Enrollment', backref='user', lazy=True)
     reviews = db.relationship('Review', backref='user', lazy=True)
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
-    received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
+    received_messages = db.relationship('Message', foreign_keys='Message.recipient_id', backref='receiver', lazy=True)
     payments = db.relationship('Payment', backref='learner', lazy=True)
 
 class Course(db.Model, SerializerMixin):
@@ -93,11 +93,23 @@ class Review(db.Model, SerializerMixin):
 
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    content = db.Column(db.Text)
-    sent_at = db.Column(db.TIMESTAMP, default=get_eat_now)
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  
+    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) 
+    content = db.Column(db.Text, nullable=False)
+    sent_at = db.Column(db.DateTime, default=db.func.now())
+
+    def __repr__(self):
+        return f"<Message {self.id}: from {self.sender_id} to {self.recipient_id}>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "sender_id": self.sender_id,
+            "recipient_id": self.recipient_id,
+            "content": self.content,
+            "sent_at": self.sent_at.isoformat()
+        }
 
 class Accolade(db.Model, SerializerMixin):
     __tablename__ = 'accolades'
