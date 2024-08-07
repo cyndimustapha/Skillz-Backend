@@ -29,12 +29,16 @@ class UserResource(Resource):
             password=data.get('password'), 
             profile_picture=data.get('profile_picture'),
             bio=data.get('bio'),
+            verified=data.get('verified'),
             created_at=data.get('created_at'),
             updated_at=data.get('updated_at')
         )
-        
+
         db.session.add(new_user)
         db.session.commit()
+
+    
+     
         return new_user.to_dict(), 201
 
     def delete(self, user_id):
