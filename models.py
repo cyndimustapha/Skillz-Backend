@@ -16,9 +16,9 @@ class User(db.Model, SerializerMixin):
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
 
-    courses = db.relationship('Course', backref='instructor', lazy=True)
-    enrollments = db.relationship('Enrollment', backref='learner', lazy=True)
-    reviews = db.relationship('Review', backref='learner', lazy=True)
+    courses = db.relationship('Course', backref='user', lazy=True)
+    enrollments = db.relationship('Enrollment', backref='user', lazy=True)
+    reviews = db.relationship('Review', backref='user', lazy=True
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
     received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
     payments = db.relationship('Payment', backref='learner', lazy=True)
@@ -91,3 +91,4 @@ class Accolade(db.Model, SerializerMixin):
     enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id'), nullable=False)
     accolade_type = db.Column(db.String(100))
     awarded_at = db.Column(db.TIMESTAMP, default=get_eat_now)
+
