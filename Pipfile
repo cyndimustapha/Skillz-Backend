@@ -14,6 +14,8 @@ flask = "*"
 flask-serialize = "*"
 sqlalchemy-serializer = "*"
 flask-restful = "*"
+python-dotenv = "*"
+faker = "*"
 
 [dev-packages]
 

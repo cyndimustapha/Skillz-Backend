@@ -1,5 +1,5 @@
 
-
+import os
 from flask import Flask, jsonify, make_response,request
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -10,7 +10,7 @@ from flask_mail import Mail
 from flask_cors import CORS
 
 from models import db
-from resources.user import UserResource
+from Resources.user import UserResource
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'Skillz_key'
@@ -18,7 +18,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 jwt_manager = JWTManager(app)
 
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI') 
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI') 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///yourdatabase.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'smtp.example.com'
