@@ -2,6 +2,7 @@ from app import app, db
 from models import User, Course, CourseContent, Payment, Enrollment, Review, Message, Accolade
 from datetime import datetime
 import pytz
+from faker import Faker
 
 # Define East African Time timezone
 EAT = pytz.timezone('Africa/Nairobi')
@@ -10,6 +11,9 @@ EAT = pytz.timezone('Africa/Nairobi')
 def get_eat_now():
     return datetime.now(EAT)
 
+# Initialize Faker
+fake = Faker()
+
 def seed_database():
     with app.app_context():
         # Clear existing data
@@ -17,115 +21,137 @@ def seed_database():
         db.create_all()
 
         # Create sample users
-        user1 = User(
-            role='learner',
-            first_name='John',
-            last_name='Doe',
-            email='john.doe@example.com',
-            password='hashedpassword',
-            profile_picture='profile1.jpg',
-            bio='A passionate learner.',
-            verified=True,
-            created_at=get_eat_now(),
-            updated_at=get_eat_now()
-        )
+        users = []
+        for _ in range(10):  # Create 10 users
+            role = fake.random_element(elements=('learner', 'instructor'))
+            user = User(
+                role=role,
+                first_name=fake.first_name(),
+                last_name=fake.last_name(),
+                email=fake.email(),
+                password='hashedpassword',
+                profile_picture=fake.image_url(),
+                bio=fake.paragraph(nb_sentences=2),
+                verified=fake.boolean(),
+                created_at=get_eat_now(),
+                updated_at=get_eat_now()
+            )
+            users.append(user)
         
-        user2 = User(
-            role='instructor',
-            first_name='Jane',
-            last_name='Smith',
-            email='jane.smith@example.com',
-            password='hashedpassword',
-            profile_picture='profile2.jpg',
-            bio='An experienced instructor.',
-            verified=True,
-            created_at=get_eat_now(),
-            updated_at=get_eat_now()
-        )
-        
-        db.session.add_all([user1, user2])
+        db.session.add_all(users)
         db.session.commit()
 
-        # Create sample course
-        course1 = Course(
-            instructor_id=user2.id,
-            title='Introduction to Programming',
-            description='A comprehensive course on programming basics.',
-            price=99.99,
-            created_at=get_eat_now(),
-            updated_at=get_eat_now()
-        )
-
-        db.session.add(course1)
+        # Create sample courses
+        courses = []
+        for _ in range(5):  # Create 5 courses
+            instructor = fake.random_element(elements=[user for user in users if user.role == 'instructor'])
+            course = Course(
+                instructor_id=instructor.id,
+                title=fake.sentence(nb_words=4),
+                description=fake.paragraph(nb_sentences=3),
+                price=fake.random_number(digits=3),
+                created_at=get_eat_now(),
+                updated_at=get_eat_now()
+            )
+            courses.append(course)
+        
+        db.session.add_all(courses)
         db.session.commit()
 
         # Create sample course content
-        course_content1 = CourseContent(
-            course_id=course1.id,
-            content_type='Video',
-            content_url='http://example.com/video1.mp4',
-            created_at=get_eat_now(),
-            updated_at=get_eat_now()
-        )
-
-        db.session.add(course_content1)
+        course_contents = []
+        for _ in range(15):  # Create 15 course contents
+            course = fake.random_element(elements=courses)
+            course_content = CourseContent(
+                course_id=course.id,
+                content_type=fake.random_element(elements=['Video', 'Text']),
+                content_url=fake.uri(),
+                created_at=get_eat_now(),
+                updated_at=get_eat_now()
+            )
+            course_contents.append(course_content)
+        
+        db.session.add_all(course_contents)
         db.session.commit()
 
-        # Create sample enrollment
-        enrollment1 = Enrollment(
-            course_id=course1.id,
-            learner_id=user1.id,
-            status='enrolled',
-            enrolled_at=get_eat_now()
-        )
-
-        db.session.add(enrollment1)
+        # Create sample enrollments
+        enrollments = []
+        for _ in range(5):  # Create 5 enrollments
+            course = fake.random_element(elements=courses)
+            learner = fake.random_element(elements=[user for user in users if user.role == 'learner'])
+            enrollment = Enrollment(
+                course_id=course.id,
+                learner_id=learner.id,
+                status=fake.random_element(elements=['enrolled', 'completed']),
+                enrolled_at=get_eat_now()
+            )
+            enrollments.append(enrollment)
+        
+        db.session.add_all(enrollments)
         db.session.commit()
 
-        # Create sample payment
-        payment1 = Payment(
-            course_id=course1.id,
-            learner_id=user1.id,
-            amount=99.99,
-            payment_status='completed',
-            payment_date=get_eat_now()
-        )
-
-        db.session.add(payment1)
+        # Create sample payments
+        payments = []
+        for _ in range(5):  # Create 5 payments
+            enrollment = fake.random_element(elements=enrollments)
+            payment = Payment(
+                course_id=enrollment.course_id,
+                learner_id=enrollment.learner_id,
+                amount=fake.random_number(digits=2),
+                payment_status=fake.random_element(elements=['completed', 'pending']),
+                payment_date=get_eat_now()
+            )
+            payments.append(payment)
+        
+        db.session.add_all(payments)
         db.session.commit()
 
-        # Create sample review
-        review1 = Review(
-            course_id=course1.id,
-            learner_id=user1.id,
-            rating=5,
-            comment='Great course!',
-            created_at=get_eat_now(),
-            updated_at=get_eat_now()
-        )
-
-        db.session.add(review1)
+        # Create sample reviews
+        reviews = []
+        for _ in range(5):  # Create 5 reviews
+            course = fake.random_element(elements=courses)
+            learner = fake.random_element(elements=[user for user in users if user.role == 'learner'])
+            review = Review(
+                course_id=course.id,
+                learner_id=learner.id,
+                rating=fake.random_int(min=1, max=5),
+                comment=fake.text(max_nb_chars=200),
+                created_at=get_eat_now(),
+                updated_at=get_eat_now()
+            )
+            reviews.append(review)
+        
+        db.session.add_all(reviews)
         db.session.commit()
 
-        # Create sample message
-        message1 = Message(
-            sender_id=user1.id,
-            receiver_id=user2.id,
-            content='Hello, I have a question about the course.',
-            sent_at=get_eat_now()
-        )
-
-        db.session.add(message1)
+        # Create sample messages
+        messages = []
+        for _ in range(5):  # Create 5 messages
+            sender = fake.random_element(elements=[user for user in users if user.role == 'learner'])
+            receiver = fake.random_element(elements=[user for user in users if user.role == 'instructor'])
+            message = Message(
+                sender_id=sender.id,
+                receiver_id=receiver.id,
+                content=fake.text(max_nb_chars=100),
+                sent_at=get_eat_now()
+            )
+            messages.append(message)
+        
+        db.session.add_all(messages)
         db.session.commit()
 
-        # Create sample accolade
-        accolade1 = Accolade(
-            enrollment_id=enrollment1.id,
-            accolade_type='Completion Certificate',
-            awarded_at=get_eat_now()
-        )
-
-        db.session.add(accolade1)
+        # Create sample accolades
+        accolades = []
+        for _ in range(5):  # Create 5 accolades
+            enrollment = fake.random_element(elements=enrollments)
+            accolade = Accolade(
+                enrollment_id=enrollment.id,
+                accolade_type=fake.random_element(elements=['Completion Certificate', 'Achievement Badge']),
+                awarded_at=get_eat_now()
+            )
+            accolades.append(accolade)
+        
+        db.session.add_all(accolades)
         db.session.commit()
 
         print('Database seeded!')
