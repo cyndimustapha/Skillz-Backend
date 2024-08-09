@@ -6,7 +6,7 @@ from .user import SignOutResource
 from .course import CourseResource
 from .course_content import CourseContentResource
 #from .payment_resource import PaymentResource
-#from .enrollments_resource import EnrollmentResource
+from .enrollments_resource import EnrollmentResource
 from .reviews import ReviewResource
 from .message_resource import MessageResource
 from .accolade import AccoladeListResource, AccoladeResource
@@ -16,7 +16,7 @@ __all__ = [
     'CourseResource',
     'CourseContentResource',
     # 'PaymentResource',
-    # 'EnrollmentResource',
+    'EnrollmentResource',
     'ReviewResource',
     'MessageResource',
     'AccoladeResource'
