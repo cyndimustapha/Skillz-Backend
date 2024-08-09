@@ -43,8 +43,8 @@ class MessageResource(Resource):
             return jsonify({"error": "Sender not found"}), 404
 
         new_message = Message(
-            sender_id=sender.id,
-            recipient_id=recipient.id,
+            sender_id=sender_id,
+            recipient_id=receiver_id,
             content=message_text,
             sent_at=datetime.now(timezone.utc)
         )
@@ -52,7 +52,16 @@ class MessageResource(Resource):
         db.session.add(new_message)
         db.session.commit()
 
-        return jsonify(new_message.to_dict()), 201
+        # Convert new_message to dictionary and ensure all fields are serializable
+        message_dict = {
+            'id': new_message.id,
+            'sender_id': new_message.sender_id,
+            'recipient_id': new_message.recipient_id,
+            'content': new_message.content,
+            'sent_at': new_message.sent_at.isoformat()  # Ensure datetime is serialized as a string
+        }
+
+        return jsonify(message_dict), 201
 
     @swag_from({
         'responses': {
@@ -78,8 +87,20 @@ class MessageResource(Resource):
             return jsonify({"error": "User not found"}), 404
 
         sent_messages = Message.query.filter_by(sender_id=user.id).order_by(Message.sent_at.desc()).all()
-        received_messages = Message.query.filter_by(receiver_id=user.id).order_by(Message.sent_at.desc()).all()
+        received_messages = Message.query.filter_by(recipient_id=user.id).order_by(Message.sent_at.desc()).all()
 
         all_messages = sorted(sent_messages + received_messages, key=lambda x: x.sent_at, reverse=True)
 
-        return jsonify([message.to_dict() for message in all_messages]), 200
+        # Convert messages to dictionary and ensure all fields are serializable
+        messages_list = [
+            {
+                'id': message.id,
+                'sender_id': message.sender_id,
+                'recipient_id': message.recipient_id,
+                'content': message.content,
+                'sent_at': message.sent_at.isoformat()  # Ensure datetime is serialized as a string
+            }
+            for message in all_messages
+        ]
+
+        return jsonify(messages_list), 200

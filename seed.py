@@ -3,6 +3,7 @@ from models import User, Course, CourseContent, Payment, Enrollment, Review, Mes
 from datetime import datetime
 import pytz
 from faker import Faker
+from werkzeug.security import generate_password_hash
 
 # Define East African Time timezone
 EAT = pytz.timezone('Africa/Nairobi')
@@ -29,7 +30,7 @@ def seed_database():
                 first_name=fake.first_name(),
                 last_name=fake.last_name(),
                 email=fake.email(),
-                password='hashedpassword',
+                password=generate_password_hash('password123'),
                 profile_picture=fake.image_url(),
                 bio=fake.paragraph(nb_sentences=2),
                 verified=fake.boolean(),

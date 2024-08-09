@@ -3,6 +3,7 @@
 from .user import SignInResource
 from .user import SignUpResource
 from .user import SignOutResource
+from .user import GetUsersResource
 from .course import CourseResource
 from .course_content import CourseContentResource
 #from .payment_resource import PaymentResource
@@ -13,6 +14,8 @@ from .accolade import AccoladeListResource, AccoladeResource
 __all__ = [
     'SignUpResource'
     'SignInResource'
+    'SignOutResource'
+    'GetUsersResource'
     'CourseResource',
     'CourseContentResource',
     # 'PaymentResource',

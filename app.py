@@ -49,6 +49,7 @@ from Resources import (
     SignInResource,
     SignUpResource,
     SignOutResource,
+    GetUsersResource,
     CourseResource,
     CourseContentResource,
     ReviewResource,
@@ -56,6 +57,7 @@ from Resources import (
     EnrollmentResource,
     AccoladeResource, 
     AccoladeListResource,
+)
 
 
 # Register API resources
@@ -64,6 +66,7 @@ api.add_resource(MessageResource, '/messages')
 api.add_resource(SignUpResource, '/sign-up')
 api.add_resource(SignInResource, '/sign-in')
 api.add_resource(SignOutResource, '/sign-out')
+api.add_resource(GetUsersResource, '/users')
 api.add_resource(CourseResource, '/courses')
 api.add_resource(CourseContentResource, '/coursecontent')
 # api.add_resource(PaymentResource, '/payments')
