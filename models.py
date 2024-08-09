@@ -1,6 +1,8 @@
 from app import db
-from sqlalchemy_serializer import SerializerMixin
+from datetime import datetime
 import pytz
+from flask_restful import Api, Resource
+from sqlalchemy_serializer import SerializerMixin
 from datetime import datetime
 
 # Define East African Time timezone
@@ -103,10 +105,10 @@ class Message(db.Model, SerializerMixin):
             "content": self.content,
             "sent_at": self.sent_at.isoformat()
         }
-
 class Accolade(db.Model, SerializerMixin):
     __tablename__ = 'accolades'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id'), nullable=False)
     accolade_type = db.Column(db.String(100))
     awarded_at = db.Column(db.TIMESTAMP, default=get_eat_now)
+    
