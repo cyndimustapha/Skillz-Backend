@@ -53,7 +53,7 @@ from Resources import (
     CourseContentResource,
     ReviewResource,
     # PaymentResource,
-    # EnrollmentResource,
+    EnrollmentResource,
     AccoladeResource, 
     AccoladeListResource,
 
