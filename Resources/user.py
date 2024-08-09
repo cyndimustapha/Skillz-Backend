@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from flask_restful import Resource
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app import db
 from models import User
 from datetime import datetime
@@ -59,3 +59,9 @@ class SignInResource(Resource):
             return {'token': access_token}, 200
         else:
             return {'message': 'Invalid credentials'}, 401
+        
+class SignOutResource(Resource):
+    @jwt_required()
+    def post(self):
+        # Invalidate the token on the client side
+        return {'message': 'Successfully logged out'}, 200

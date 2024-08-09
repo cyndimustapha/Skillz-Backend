@@ -2,6 +2,7 @@
 
 from .user import SignInResource
 from .user import SignUpResource
+from .user import SignOutResource
 from .course import CourseResource
 from .course_content import CourseContentResource
 #from .payment_resource import PaymentResource
