@@ -2,10 +2,12 @@ from datetime import datetime
 import pytz
 from sqlalchemy_serializer import SerializerMixin
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData as SQLAMetaData
 
-metadata = MetaData
+# Initialize MetaData instance
+metadata = SQLAMetaData()
 
+# Initialize SQLAlchemy with MetaData instance
 db = SQLAlchemy(metadata=metadata)
 
 # Define East African Time timezone
@@ -13,9 +15,6 @@ EAT = pytz.timezone('Africa/Nairobi')
 
 def get_eat_now():
     return datetime.now(EAT)
-
-eat = get_eat_now()
-
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
