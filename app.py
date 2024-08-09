@@ -40,7 +40,8 @@ def get_eat_now():
 from models import User, Course, CourseContent, Payment, Enrollment, Review, Message, Accolade
 from Resources import (
     MessageResource,
-    UserResource,
+    SignInResource,
+    SignUpResource,
     CourseResource,
     CourseContentResource,
     # PaymentResource,
@@ -52,7 +53,8 @@ from Resources import (
 # Register API resources
 api = Api(app)
 api.add_resource(MessageResource, '/messages')
-api.add_resource(UserResource, '/users')
+api.add_resource(SignUpResource, '/sign-up')
+api.add_resource(SignInResource, '/sign-in')
 api.add_resource(CourseResource, '/courses')
 api.add_resource(CourseContentResource, '/coursecontent')
 # api.add_resource(PaymentResource, '/payments')
