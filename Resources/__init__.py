@@ -1,6 +1,7 @@
 # resources/__init__.py
 
-from .user import UserResource
+from .user import SignInResource
+from .user import SignUpResource
 from .course import CourseResource
 from .course_content import CourseContentResource
 #from .payment_resource import PaymentResource
@@ -10,7 +11,8 @@ from .message_resource import MessageResource
 #from .accolade_resource import AccoladeResource
 
 __all__ = [
-    'UserResource',
+    'SignUpResource'
+    'SignInResource'
     'CourseResource',
     'CourseContentResource',
     # 'PaymentResource',

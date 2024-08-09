@@ -1,4 +1,3 @@
-
 from flask import Flask, jsonify, make_response, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -9,8 +8,11 @@ from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_cors import CORS
 
-
-from models import db
+# Initialize extensions
+db = SQLAlchemy()
+migrate = Migrate()
+jwt_manager = JWTManager()
+mail = Mail()
 
 app = Flask(__name__)
 
@@ -28,11 +30,10 @@ app.config['MAIL_PASSWORD'] = 'your-email-password'
 app.config['MAIL_DEFAULT_SENDER'] = 'your-email@example.com'
 
 # Initialize extensions
-migrate = Migrate(app, db)
-jwt_manager = JWTManager(app)
-
 db.init_app(app)
-mail = Mail(app)
+migrate.init_app(app, db)
+jwt_manager.init_app(app)
+mail.init_app(app)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # Define East African Time timezone
@@ -45,7 +46,8 @@ def get_eat_now():
 from models import User, Course, CourseContent, Payment, Enrollment, Review, Message, Accolade
 from Resources import (
     MessageResource,
-    UserResource,
+    SignInResource,
+    SignUpResource,
     CourseResource,
     CourseContentResource,
     # PaymentResource,
@@ -57,14 +59,14 @@ from Resources import (
 # Register API resources
 api = Api(app)
 api.add_resource(MessageResource, '/messages')
-api.add_resource(UserResource, '/users')
+api.add_resource(SignUpResource, '/sign-up')
+api.add_resource(SignInResource, '/sign-in')
 api.add_resource(CourseResource, '/courses')
 api.add_resource(CourseContentResource, '/coursecontent')
 # api.add_resource(PaymentResource, '/payments')
 # api.add_resource(EnrollmentResource, '/enrollments')
 # api.add_resource(ReviewResource, '/reviews')
 # api.add_resource(AccoladeResource, '/accolades')
-
 
 @app.before_request
 def handle_preflight():

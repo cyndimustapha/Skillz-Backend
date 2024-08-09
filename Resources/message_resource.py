@@ -25,13 +25,13 @@ class MessageResource(Resource):
     def post(self):
         data = request.get_json()
 
-        recipient_id = data.get('user_id')
+        receiver_id = data.get('user_id')
         message_text = data.get('message')
 
-        if not recipient_id or not message_text:
+        if not receiver_id or not message_text:
             return jsonify({"error": "User ID and message text are required"}), 400
 
-        recipient = User.query.get(recipient_id)
+        recipient = User.query.get(receiver_id)
         if not recipient:
             return jsonify({"error": "Recipient not found"}), 404
 
@@ -78,7 +78,7 @@ class MessageResource(Resource):
             return jsonify({"error": "User not found"}), 404
 
         sent_messages = Message.query.filter_by(sender_id=user.id).order_by(Message.sent_at.desc()).all()
-        received_messages = Message.query.filter_by(recipient_id=user.id).order_by(Message.sent_at.desc()).all()
+        received_messages = Message.query.filter_by(receiver_id=user.id).order_by(Message.sent_at.desc()).all()
 
         all_messages = sorted(sent_messages + received_messages, key=lambda x: x.sent_at, reverse=True)
 
