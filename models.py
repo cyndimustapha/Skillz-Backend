@@ -1,14 +1,8 @@
+from app import db
 from datetime import datetime
 import pytz
+from flask_restful import Api, Resource
 from sqlalchemy_serializer import SerializerMixin
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData as SQLAMetaData
-
-# Initialize MetaData instance
-metadata = SQLAMetaData()
-
-# Initialize SQLAlchemy with MetaData instance
-db = SQLAlchemy(metadata=metadata)
 
 # Define East African Time timezone
 EAT = pytz.timezone('Africa/Nairobi')
@@ -29,6 +23,7 @@ class User(db.Model, SerializerMixin):
     verified = db.Column(db.Boolean, default=False)  # Optional, default to False
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
+    last_sign_in = db.Column(db.DateTime)
 
     courses = db.relationship('Course', backref='user', lazy=True)
     enrollments = db.relationship('Enrollment', backref='user', lazy=True)
@@ -36,6 +31,21 @@ class User(db.Model, SerializerMixin):
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
     received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
     payments = db.relationship('Payment', backref='learner', lazy=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'role': self.role,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'profile_picture': self.profile_picture,
+            'bio': self.bio,
+            'verified': self.verified,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'last_sign_in': self.last_sign_in.isoformat() if self.last_sign_in else None,
+        }
 
 class Course(db.Model, SerializerMixin):
     __tablename__ = 'courses'
@@ -93,11 +103,11 @@ class Review(db.Model, SerializerMixin):
 
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  
     receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) 
     content = db.Column(db.Text, nullable=False)
-    sent_at = db.Column(db.DateTime, default=db.func.now())
+    sent_at = db.Column(db.DateTime, default=get_eat_now)
 
     def __repr__(self):
         return f"<Message {self.id}: from {self.sender_id} to {self.receiver_id}>"
@@ -108,7 +118,7 @@ class Message(db.Model, SerializerMixin):
             "sender_id": self.sender_id,
             "receiver_id": self.receiver_id,
             "content": self.content,
-            "sent_at": self.sent_at.isoformat()
+            "sent_at": self.sent_at.isoformat() if self.sent_at else None
         }
 
 class Accolade(db.Model, SerializerMixin):

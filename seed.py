@@ -1,106 +1,161 @@
-from faker import Faker
-from models import db, User, Course, CourseContent, Payment, Enrollment, Review, Message, Accolade
-from app import app
+from app import app, db
+from models import User, Course, CourseContent, Payment, Enrollment, Review, Message, Accolade
 from datetime import datetime
-import random
+import pytz
+from faker import Faker
+from werkzeug.security import generate_password_hash
 
-random.seed(1)
+# Define East African Time timezone
+EAT = pytz.timezone('Africa/Nairobi')
+
+# Define function to get current time in EAT
+def get_eat_now():
+    return datetime.now(EAT)
+
+# Initialize Faker
 fake = Faker()
 
-with app.app_context():
+def seed_database():
+    with app.app_context():
+        # Clear existing data
+        db.drop_all()
+        db.create_all()
 
-    print('Start seeding...')
+        # Create sample users
+        users = []
+        for _ in range(10):  # Create 10 users
+            role = fake.random_element(elements=('learner', 'instructor'))
+            user = User(
+                role=role,
+                first_name=fake.first_name(),
+                last_name=fake.last_name(),
+                email=fake.email(),
+                password=generate_password_hash('password123'),
+                profile_picture=fake.image_url(),
+                bio=fake.paragraph(nb_sentences=2),
+                verified=fake.boolean(),
+                created_at=get_eat_now(),
+                updated_at=get_eat_now()
+            )
+            users.append(user)
+        
+        db.session.add_all(users)
+        db.session.commit()
 
-    # Clear existing data
-    print("Deleting data...")
-    User.query.delete()
-    Course.query.delete()
-    CourseContent.query.delete()
-    Payment.query.delete()
-    Enrollment.query.delete()
-    Review.query.delete()
-    Message.query.delete()
-    Accolade.query.delete()
+        # Create sample courses
+        courses = []
+        for _ in range(5):  # Create 5 courses
+            instructor = fake.random_element(elements=[user for user in users if user.role == 'instructor'])
+            course = Course(
+                instructor_id=instructor.id,
+                title=fake.sentence(nb_words=4),
+                description=fake.paragraph(nb_sentences=3),
+                price=fake.random_number(digits=3),
+                created_at=get_eat_now(),
+                updated_at=get_eat_now()
+            )
+            courses.append(course)
+        
+        db.session.add_all(courses)
+        db.session.commit()
 
-    # Create users
-    print("Creating users...")
-    users = []
-    for n in range(10):
-        role = random.choice(['instructor', 'learner'])
-        user = User(
-            first_name=fake.first_name(),
-            last_name=fake.last_name(),
-            email=fake.email(),
-            password='12345',
-            profile_picture=fake.image_url(),
-            bio=fake.paragraph(nb_sentences=5, variable_nb_sentences=False),
-            role=role,
-            verified=False
-        )
-        users.append(user)
+        # Create sample course content
+        course_contents = []
+        for _ in range(15):  # Create 15 course contents
+            course = fake.random_element(elements=courses)
+            course_content = CourseContent(
+                course_id=course.id,
+                content_type=fake.random_element(elements=['Video', 'Text']),
+                content_url=fake.uri(),
+                created_at=get_eat_now(),
+                updated_at=get_eat_now()
+            )
+            course_contents.append(course_content)
+        
+        db.session.add_all(course_contents)
+        db.session.commit()
 
-    db.session.add_all(users)
-    db.session.commit()
+        # Create sample enrollments
+        enrollments = []
+        for _ in range(5):  # Create 5 enrollments
+            course = fake.random_element(elements=courses)
+            learner = fake.random_element(elements=[user for user in users if user.role == 'learner'])
+            enrollment = Enrollment(
+                course_id=course.id,
+                learner_id=learner.id,
+                status=fake.random_element(elements=['enrolled', 'completed']),
+                enrolled_at=get_eat_now()
+            )
+            enrollments.append(enrollment)
+        
+        db.session.add_all(enrollments)
+        db.session.commit()
 
-    # Print created users
-    print("Users created:")
-    for user in users:
-        print(user)
+        # Create sample payments
+        payments = []
+        for _ in range(5):  # Create 5 payments
+            enrollment = fake.random_element(elements=enrollments)
+            payment = Payment(
+                course_id=enrollment.course_id,
+                learner_id=enrollment.learner_id,
+                amount=fake.random_number(digits=2),
+                payment_status=fake.random_element(elements=['completed', 'pending']),
+                payment_date=get_eat_now()
+            )
+            payments.append(payment)
+        
+        db.session.add_all(payments)
+        db.session.commit()
 
-    # Identify instructors
-    instructors = [user for user in users if user.role == "instructor"]
-    print("Instructors identified:")
-    for instructor in instructors:
-        print(instructor.name)
+        # Create sample reviews
+        reviews = []
+        for _ in range(5):  # Create 5 reviews
+            course = fake.random_element(elements=courses)
+            learner = fake.random_element(elements=[user for user in users if user.role == 'learner'])
+            review = Review(
+                course_id=course.id,
+                learner_id=learner.id,
+                rating=fake.random_int(min=1, max=5),
+                comment=fake.text(max_nb_chars=200),
+                created_at=get_eat_now(),
+                updated_at=get_eat_now()
+            )
+            reviews.append(review)
+        
+        db.session.add_all(reviews)
+        db.session.commit()
 
-    # Create courses
-    print("Creating courses...")
-    courses = []
-    for n in range(7):
-        # Randomly assign an instructor to each course
-        instructor = random.choice(instructors) if instructors else None
-        course = Course(
-            title=fake.sentence(nb_words=4),
-            description=fake.paragraph(nb_sentences=3, variable_nb_sentences=False),
-            instructor_id=instructor.id if instructor else None,
-            price=random.randint(3000,5000)
-            
-        )
-        courses.append(course)
+        # Create sample messages
+        messages = []
+        for _ in range(5):  # Create 5 messages
+            sender = fake.random_element(elements=[user for user in users if user.role == 'learner'])
+            receiver = fake.random_element(elements=[user for user in users if user.role == 'instructor'])
+            message = Message(
+                sender_id=sender.id,
+                receiver_id=receiver.id,
+                content=fake.text(max_nb_chars=100),
+                sent_at=get_eat_now()
+            )
+            messages.append(message)
+        
+        db.session.add_all(messages)
+        db.session.commit()
 
-    db.session.add_all(courses)
-    db.session.commit()
+        # Create sample accolades
+        accolades = []
+        for _ in range(5):  # Create 5 accolades
+            enrollment = fake.random_element(elements=enrollments)
+            accolade = Accolade(
+                enrollment_id=enrollment.id,
+                accolade_type=fake.random_element(elements=['Completion Certificate', 'Achievement Badge']),
+                awarded_at=get_eat_now()
+            )
+            accolades.append(accolade)
+        
+        db.session.add_all(accolades)
+        db.session.commit()
 
-    # Print created courses
-    print("Courses created:")
-    for course in courses:
-        print(course)
+        print('Database seeded!')
 
-
-
-    #Creating course content
-    print("Creating course content...")
-    course_contents = []
-    for n in range(20):
-        course_ids = [course.id for course in courses]
-        chosen_course_id=random.choices(course_ids, weights=None, k=1)
-        course_content = CourseContent(
-            course_id=chosen_course_id[0],
-            content_type=random.choice(['video','text']),
-            content_url=fake.uri(),
-            
-        )
-        course_contents.append(course_content)
-
-    db.session.add_all(course_content)
-    db.session.commit()
-
-
-
-    # #Creating enrollments
-    # print("Creating enrollments")
-    # enrollments=[]
-    # for n in range(6):
-    #     course_ids = [course.id for course in courses]
-    #     chosen_course_id=random.choices(course_ids, weights=None, k=1)
-    #     learners_ids= [user.id for user in users if user.role == 'learner']
+if __name__ == '__main__':
+    seed_database()

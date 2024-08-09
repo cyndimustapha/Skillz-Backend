@@ -4,8 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+flask-sqlalchemy = "*"
+pytz = "*"
+flask-restful = "*"
+flask = "*"
 flask-jwt-extended = "*"
-flask-mail = "*"
+flasgger = "*"
+sqlalchemy-serializer = "*"
+datetime = "*"
+flask-migrate = "*"
 flask-cors = "*"
 flask-migrate = "*"
 sqlalchemy = "*"
@@ -14,8 +21,6 @@ flask = "*"
 flask-serialize = "*"
 sqlalchemy-serializer = "*"
 flask-restful = "*"
-python-dotenv = "*"
-faker = "*"
 
 [dev-packages]
 
