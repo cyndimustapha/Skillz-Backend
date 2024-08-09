@@ -50,10 +50,6 @@ from Resources import (
     SignUpResource,
     CourseResource,
     CourseContentResource,
-    # PaymentResource,
-    # EnrollmentResource,
-    # ReviewResource,
-    # AccoladeResource,
 )
 
 # Register API resources
@@ -63,10 +59,6 @@ api.add_resource(SignUpResource, '/sign-up')
 api.add_resource(SignInResource, '/sign-in')
 api.add_resource(CourseResource, '/courses')
 api.add_resource(CourseContentResource, '/coursecontent')
-# api.add_resource(PaymentResource, '/payments')
-# api.add_resource(EnrollmentResource, '/enrollments')
-# api.add_resource(ReviewResource, '/reviews')
-# api.add_resource(AccoladeResource, '/accolades')
 
 @app.before_request
 def handle_preflight():
