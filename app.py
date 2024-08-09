@@ -48,6 +48,7 @@ from Resources import (
     MessageResource,
     SignInResource,
     SignUpResource,
+    SignOutResource,
     CourseResource,
     CourseContentResource,
     ReviewResource,
@@ -55,20 +56,22 @@ from Resources import (
     # EnrollmentResource,
     AccoladeResource, 
     AccoladeListResource,
-)
+
 
 # Register API resources
 api = Api(app)
 api.add_resource(MessageResource, '/messages')
 api.add_resource(SignUpResource, '/sign-up')
 api.add_resource(SignInResource, '/sign-in')
+api.add_resource(SignOutResource, '/sign-out')
 api.add_resource(CourseResource, '/courses')
 api.add_resource(CourseContentResource, '/coursecontent')
 # api.add_resource(PaymentResource, '/payments')
-# api.add_resource(EnrollmentResource, '/enrollments')
+api.add_resource(EnrollmentResource, '/enrollments')
 api.add_resource(ReviewResource, '/reviews')
 api.add_resource(AccoladeListResource, '/accolades')
 api.add_resource(AccoladeResource, '/accolades/<int:id>')
+
 
 
 @app.before_request

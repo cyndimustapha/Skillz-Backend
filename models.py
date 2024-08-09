@@ -1,15 +1,9 @@
+from app import db
 from datetime import datetime
 import pytz
 from flask_restful import Api, Resource
 from sqlalchemy_serializer import SerializerMixin
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData as SQLAMetaData
-
-# Initialize MetaData instance
-metadata = SQLAMetaData()
-
-# Initialize SQLAlchemy with MetaData instance
-db = SQLAlchemy(metadata=metadata)
+from datetime import datetime
 
 # Define East African Time timezone
 EAT = pytz.timezone('Africa/Nairobi')
