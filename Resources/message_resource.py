@@ -35,8 +35,7 @@ class MessageResource(Resource):
         if not recipient:
             return jsonify({"error": "Recipient not found"}), 404
 
-        sender_info = get_jwt_identity()
-        sender_id = sender_info['id']
+        sender_id = get_jwt_identity()
         
         sender = User.query.get(sender_id)
         if not sender:
@@ -44,7 +43,7 @@ class MessageResource(Resource):
 
         new_message = Message(
             sender_id=sender_id,
-            recipient_id=receiver_id,
+            receiver_id=receiver_id,
             content=message_text,
             sent_at=datetime.now(timezone.utc)
         )
@@ -52,14 +51,7 @@ class MessageResource(Resource):
         db.session.add(new_message)
         db.session.commit()
 
-        # Convert new_message to dictionary and ensure all fields are serializable
-        message_dict = {
-            'id': new_message.id,
-            'sender_id': new_message.sender_id,
-            'recipient_id': new_message.recipient_id,
-            'content': new_message.content,
-            'sent_at': new_message.sent_at.isoformat()  # Ensure datetime is serialized as a string
-        }
+        message_dict = new_message.to_dict()
 
         return jsonify(message_dict), 201
 
@@ -79,28 +71,21 @@ class MessageResource(Resource):
     })
     @jwt_required()
     def get(self):
-        sender_info = get_jwt_identity()
-        user_id = sender_info['id']
+        sender_id = get_jwt_identity()
+        receiver_id = request.args.get('user_id')
 
-        user = User.query.get(user_id)
+        if not receiver_id:
+            return jsonify({"error": "Recipient user ID is required"}), 400
+
+        user = User.query.get(receiver_id)
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        sent_messages = Message.query.filter_by(sender_id=user.id).order_by(Message.sent_at.desc()).all()
-        received_messages = Message.query.filter_by(recipient_id=user.id).order_by(Message.sent_at.desc()).all()
+        sent_messages = Message.query.filter_by(sender_id=sender_id, receiver_id=receiver_id).order_by(Message.sent_at.asc()).all()
+        received_messages = Message.query.filter_by(sender_id=receiver_id, receiver_id=sender_id).order_by(Message.sent_at.asc()).all()
 
-        all_messages = sorted(sent_messages + received_messages, key=lambda x: x.sent_at, reverse=True)
+        all_messages = sorted(sent_messages + received_messages, key=lambda x: x.sent_at)
 
-        # Convert messages to dictionary and ensure all fields are serializable
-        messages_list = [
-            {
-                'id': message.id,
-                'sender_id': message.sender_id,
-                'recipient_id': message.recipient_id,
-                'content': message.content,
-                'sent_at': message.sent_at.isoformat()  # Ensure datetime is serialized as a string
-            }
-            for message in all_messages
-        ]
+        messages_list = [message.to_dict() for message in all_messages]
 
         return jsonify(messages_list), 200
