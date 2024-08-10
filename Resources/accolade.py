@@ -1,7 +1,6 @@
 from flask import request, jsonify
 from flask_restful import Resource
-from app import db
-from models import Accolade
+from models import Accolade,db
 
 class AccoladeResource(Resource):
     def get(self, id):

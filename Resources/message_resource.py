@@ -1,8 +1,7 @@
 from flask import request, jsonify
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import db
-from models import Message, User
+from models import Message, User,db
 from datetime import datetime, timezone
 from flasgger import swag_from
 
