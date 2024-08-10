@@ -56,6 +56,7 @@ class Course(db.Model, SerializerMixin):
     price = db.Column(db.DECIMAL(10, 2))
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
+    image=db.Column(db.String(225), nullable=True)
 
     contents = db.relationship('CourseContent', backref='course', lazy=True)
     enrollments = db.relationship('Enrollment', backref='course', lazy=True)

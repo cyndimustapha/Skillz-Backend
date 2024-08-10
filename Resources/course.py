@@ -23,7 +23,8 @@ class CourseResource(Resource):
                 instructor_id=data['instructor_id'],
                 title=data['title'],
                 description=data['description'],
-                price=data['price']
+                price=data['price'],
+                image=data['image']
             )
             db.session.add(new_course)
             db.session.commit()
