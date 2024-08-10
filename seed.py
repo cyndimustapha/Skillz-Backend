@@ -50,7 +50,7 @@ def seed_database():
                 instructor_id=instructor.id,
                 title=fake.sentence(nb_words=4),
                 description=fake.paragraph(nb_sentences=3),
-                price=fake.random_number(digits=3),
+                price=fake.random_number(digits=2),
                 created_at=get_eat_now(),
                 updated_at=get_eat_now()
             )
