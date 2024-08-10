@@ -12,16 +12,16 @@ from .reviews import ReviewResource
 from .message_resource import MessageResource
 from .accolade import AccoladeListResource, AccoladeResource
 __all__ = [
-    'SignUpResource'
-    'SignInResource'
-    'SignOutResource'
-    'GetUsersResource'
+    'SignUpResource',
+    'SignInResource',
+    'SignOutResource',
+    'GetUsersResource',
     'CourseResource',
     'CourseContentResource',
     # 'PaymentResource',
     'EnrollmentResource',
     'ReviewResource',
     'MessageResource',
-    'AccoladeResource'
+    'AccoladeResource',
     'AccoladeListResource'
 ]

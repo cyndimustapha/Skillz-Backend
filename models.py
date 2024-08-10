@@ -1,4 +1,5 @@
-from app import db
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
 from datetime import datetime
 import pytz
 from flask_restful import Api, Resource
@@ -9,6 +10,13 @@ EAT = pytz.timezone('Africa/Nairobi')
 
 def get_eat_now():
     return datetime.now(EAT)
+
+metadata = MetaData(
+    naming_convention={
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    }
+)
+db = SQLAlchemy(metadata=metadata)
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -62,6 +70,17 @@ class Course(db.Model, SerializerMixin):
     reviews = db.relationship('Review', backref='course', lazy=True)
     payments = db.relationship('Payment', backref='course', lazy=True)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'instructor_id': self.instructor_id,
+            'title': self.title,
+            'description': self.description,
+            'price': str(self.price) if self.price else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+
 class CourseContent(db.Model, SerializerMixin):
     __tablename__ = 'coursecontent'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -71,6 +90,16 @@ class CourseContent(db.Model, SerializerMixin):
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'course_id': self.course_id,
+            'content_type': self.content_type,
+            'content_url': self.content_url,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+
 class Payment(db.Model, SerializerMixin):
     __tablename__ = 'payments'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -79,6 +108,16 @@ class Payment(db.Model, SerializerMixin):
     amount = db.Column(db.DECIMAL(10, 2))
     payment_status = db.Column(db.String(50))
     payment_date = db.Column(db.TIMESTAMP, default=get_eat_now)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'course_id': self.course_id,
+            'learner_id': self.learner_id,
+            'amount': str(self.amount) if self.amount else None,
+            'payment_status': self.payment_status,
+            'payment_date': self.payment_date.isoformat() if self.payment_date else None,
+        }
 
 class Enrollment(db.Model, SerializerMixin):
     __tablename__ = 'enrollments'
@@ -91,6 +130,16 @@ class Enrollment(db.Model, SerializerMixin):
 
     accolades = db.relationship('Accolade', backref='enrollment', lazy=True)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'course_id': self.course_id,
+            'learner_id': self.learner_id,
+            'status': self.status,
+            'enrolled_at': self.enrolled_at.isoformat() if self.enrolled_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+        }
+
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -100,6 +149,17 @@ class Review(db.Model, SerializerMixin):
     comment = db.Column(db.Text)
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'course_id': self.course_id,
+            'learner_id': self.learner_id,
+            'rating': self.rating,
+            'comment': self.comment,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
 
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
@@ -114,11 +174,11 @@ class Message(db.Model, SerializerMixin):
 
     def to_dict(self):
         return {
-            "id": self.id,
-            "sender_id": self.sender_id,
-            "receiver_id": self.receiver_id,
-            "content": self.content,
-            "sent_at": self.sent_at.isoformat() if self.sent_at else None
+            'id': self.id,
+            'sender_id': self.sender_id,
+            'receiver_id': self.receiver_id,
+            'content': self.content,
+            'sent_at': self.sent_at.isoformat() if self.sent_at else None,
         }
 
 class Accolade(db.Model, SerializerMixin):
@@ -127,3 +187,11 @@ class Accolade(db.Model, SerializerMixin):
     enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id'), nullable=False)
     accolade_type = db.Column(db.String(100))
     awarded_at = db.Column(db.TIMESTAMP, default=get_eat_now)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'enrollment_id': self.enrollment_id,
+            'accolade_type': self.accolade_type,
+            'awarded_at': self.awarded_at.isoformat() if self.awarded_at else None,
+        }
