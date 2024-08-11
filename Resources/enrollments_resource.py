@@ -1,7 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from app import db
-from models import Enrollment
+from models import Enrollment,db
 
 class EnrollmentResource(Resource):
     def get(self, enrollment_id=None):
