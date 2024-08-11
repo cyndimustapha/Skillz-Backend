@@ -1,91 +1,44 @@
 from flask import request, jsonify
-from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import db
-from models import Message, User
-from datetime import datetime, timezone
-from flasgger import swag_from
+from flask_restful import Resource
+from models import db, Message, User
 
 class MessageResource(Resource):
-    @swag_from({
-        'responses': {
-            201: {
-                'description': 'Message created successfully',
-                'schema': {'type': 'object'}
-            },
-            400: {
-                'description': 'User ID and message text are required'
-            },
-            404: {
-                'description': 'Recipient not found or Sender not found'
-            }
-        }
-    })
     @jwt_required()
     def post(self):
-        data = request.get_json()
-
-        receiver_id = data.get('user_id')
-        message_text = data.get('message')
-
-        if not receiver_id or not message_text:
-            return jsonify({"error": "User ID and message text are required"}), 400
-
-        recipient = User.query.get(receiver_id)
-        if not recipient:
-            return jsonify({"error": "Recipient not found"}), 404
-
+        data = request.json
         sender_id = get_jwt_identity()
-        
-        sender = User.query.get(sender_id)
-        if not sender:
-            return jsonify({"error": "Sender not found"}), 404
+        receiver_id = data.get('receiver_id')
+        content = data.get('content')
 
-        new_message = Message(
-            sender_id=sender_id,
-            receiver_id=receiver_id,
-            content=message_text,
-            sent_at=datetime.now(timezone.utc)
-        )
+        if not receiver_id or not content:
+            return jsonify({"error": "Receiver ID and content are required"}), 400
 
-        db.session.add(new_message)
+        message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content)
+        db.session.add(message)
         db.session.commit()
 
-        message_dict = new_message.to_dict()
+        return jsonify({"message": "Message sent successfully", "data": message.to_dict()}), 201
 
-        return jsonify(message_dict), 201
-
-    @swag_from({
-        'responses': {
-            200: {
-                'description': 'List of messages',
-                'schema': {
-                    'type': 'array',
-                    'items': {'type': 'object'}
-                }
-            },
-            404: {
-                'description': 'User not found'
-            }
-        }
-    })
     @jwt_required()
-    def get(self):
-        sender_id = get_jwt_identity()
-        receiver_id = request.args.get('user_id')
+    def get(self, user_id=None):
+        current_user_id = get_jwt_identity()
 
-        if not receiver_id:
-            return jsonify({"error": "Recipient user ID is required"}), 400
+        if user_id:
+            # Fetch messages between the current user and the specified user
+            messages = Message.query.filter(
+                ((Message.sender_id == current_user_id) & (Message.receiver_id == user_id)) |
+                ((Message.sender_id == user_id) & (Message.receiver_id == current_user_id))
+            ).order_by(Message.timestamp.asc()).all()
 
-        user = User.query.get(receiver_id)
-        if not user:
-            return jsonify({"error": "User not found"}), 404
+            message_list = [message.to_dict() for message in messages]
+            return jsonify(message_list), 200
 
-        sent_messages = Message.query.filter_by(sender_id=sender_id, receiver_id=receiver_id).order_by(Message.sent_at.asc()).all()
-        received_messages = Message.query.filter_by(sender_id=receiver_id, receiver_id=sender_id).order_by(Message.sent_at.asc()).all()
+        else:
+            # Get distinct users with whom the current user has conversations
+            conversations = db.session.query(User).filter(
+                (User.id == Message.receiver_id) | (User.id == Message.sender_id)
+            ).distinct().all()
 
-        all_messages = sorted(sent_messages + received_messages, key=lambda x: x.sent_at)
-
-        messages_list = [message.to_dict() for message in all_messages]
-
-        return jsonify(messages_list), 200
+            conversation_list = [user.to_dict() for user in conversations]
+            return jsonify(conversation_list), 200

@@ -1,5 +1,3 @@
-# resources/enrollment_resource.py
-
 from flask import request
 from flask_restful import Resource
 from app import db
@@ -11,7 +9,7 @@ class EnrollmentResource(Resource):
             enrollment = Enrollment.query.get_or_404(enrollment_id)
             return enrollment.to_dict(), 200
         else:
-            enrollments = Enrollment.query.all()
+            enrollments = Enrollment.query.filter_by(learner_id=request.args.get('learner_id')).all()
             return [enrollment.to_dict() for enrollment in enrollments], 200
 
     def post(self):
