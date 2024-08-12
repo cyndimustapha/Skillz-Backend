@@ -50,12 +50,12 @@ def seed_database():
 
             # Create sample courses
             courses = []
-            for _ in range(5):  # Create 5 courses
+            for _ in range(20):  # Create 20 courses
                 instructor = fake.random_element(elements=[user for user in users if user.role == 'instructor'])
                 course = Course(
                     instructor_id=instructor.id,
                     title=fake.sentence(nb_words=4),
-                    description=fake.paragraph(nb_sentences=3),
+                    description=fake.job(),
                     price=fake.random_number(digits=2),
                     created_at=get_eat_now(),
                     updated_at=get_eat_now(),
