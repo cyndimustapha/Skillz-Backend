@@ -44,20 +44,25 @@ def seed_database():
 
         # Create sample courses
         courses = []
-        for _ in range(5):  # Create 5 courses
-            instructor = fake.random_element(elements=[user for user in users if user.role == 'instructor'])
-            course = Course(
-                instructor_id=instructor.id,
-                title=fake.sentence(nb_words=4),
-                description=fake.paragraph(nb_sentences=3),
-                price=fake.random_number(digits=3),
-                created_at=get_eat_now(),
-                updated_at=get_eat_now()
-            )
-            courses.append(course)
-        
+        for i in range(15):  # Create 15 courses
+           instructor = fake.random_element(elements=[user for user in users if user.role == 'instructor'])
+                                                
+           image_url = f'https://images.pexels.com/photos/459403/pexels-photo-459403.jpeg?auto=compress&cs=tinysrgb&w={1260 + i}&h={750 + i}&dpr=1' 
+
+           course = Course(
+               instructor_id=instructor.id,
+               title=fake.sentence(nb_words=4),
+               description=fake.paragraph(nb_sentences=3),
+               price=fake.random_number(digits=3),
+               image_url=image_url,  # Unique placeholder course image
+               created_at=get_eat_now(),
+               updated_at=get_eat_now()
+           )
+           courses.append(course)
+
         db.session.add_all(courses)
         db.session.commit()
+
 
         # Create sample course content
         course_contents = []
@@ -90,7 +95,7 @@ def seed_database():
         
         db.session.add_all(enrollments)
         db.session.commit()
-
+        
         # Create sample payments
         payments = []
         for _ in range(5):  # Create 5 payments
