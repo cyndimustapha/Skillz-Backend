@@ -19,7 +19,7 @@ class ReviewResource(Resource):
             course_id=data['course_id'],
             learner_id=data['learner_id'],
             rating=data['rating'],
-            comment=data.get('comment')  # Use get() to handle missing fields
+            comment=data.get('comment')  
         )
         db.session.add(new_review)
         db.session.commit()

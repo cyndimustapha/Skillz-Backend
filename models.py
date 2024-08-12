@@ -26,9 +26,9 @@ class User(db.Model, SerializerMixin):
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    profile_picture = db.Column(db.String(255), nullable=True)  # Optional
-    bio = db.Column(db.Text, nullable=True)  # Optional
-    verified = db.Column(db.Boolean, default=False)  # Optional, default to False
+    profile_picture = db.Column(db.String(255), nullable=True)  
+    bio = db.Column(db.Text, nullable=True)  
+    verified = db.Column(db.Boolean, default=False)  
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
     last_sign_in = db.Column(db.DateTime)
@@ -62,6 +62,7 @@ class Course(db.Model, SerializerMixin):
     title = db.Column(db.String(255))
     description = db.Column(db.Text)
     price = db.Column(db.DECIMAL(10, 2))
+    image_url = db.Column(db.String(255)) 
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
 
@@ -77,6 +78,7 @@ class Course(db.Model, SerializerMixin):
             'title': self.title,
             'description': self.description,
             'price': str(self.price) if self.price else None,
+            'image_url': self.image_url, 
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
