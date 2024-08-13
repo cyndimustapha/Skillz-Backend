@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 from models import db, Message, User
@@ -12,13 +12,15 @@ class MessageResource(Resource):
         content = data.get('content')
 
         if not receiver_id or not content:
-            return jsonify({"error": "Receiver ID and content are required"}), 400
+            return {"error": "Receiver ID and content are required"}, 400
 
+        # Create and save the message
         message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content)
         db.session.add(message)
         db.session.commit()
 
-        return jsonify({"message": "Message sent successfully", "data": message.to_dict()}), 201
+        # Return the newly created message as a dictionary
+        return {"message": "Message sent successfully", "data": message.to_dict()}, 201
 
     @jwt_required()
     def get(self, user_id=None):
@@ -31,8 +33,9 @@ class MessageResource(Resource):
                 ((Message.sender_id == user_id) & (Message.receiver_id == current_user_id))
             ).order_by(Message.timestamp.asc()).all()
 
+            # Convert messages to a list of dictionaries
             message_list = [message.to_dict() for message in messages]
-            return jsonify(message_list), 200
+            return message_list, 200
 
         else:
             # Get distinct users with whom the current user has conversations
@@ -40,5 +43,6 @@ class MessageResource(Resource):
                 (User.id == Message.receiver_id) | (User.id == Message.sender_id)
             ).distinct().all()
 
+            # Convert users to a list of dictionaries
             conversation_list = [user.to_dict() for user in conversations]
-            return jsonify(conversation_list), 200
+            return conversation_list, 200
