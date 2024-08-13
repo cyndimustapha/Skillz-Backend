@@ -88,4 +88,23 @@ class UsersInConversationResource(Resource):
         users = User.query.filter(User.id.in_(user_ids)).all()
         users_list = [user.to_dict() for user in users]
 
-        return jsonify(users_list)
+        return jsonify(users_list) 
+
+class UserResource(Resource):
+    @jwt_required()
+    def get(self, user_id=None):
+        if user_id:
+            # Fetch a user by ID
+            user = User.query.get(user_id)
+            if user:
+                return user.to_dict(), 200
+            else:
+                return {'message': 'User not found'}, 404
+        else:
+            # Fetch the currently logged-in user's details
+            current_user_id = get_jwt_identity()
+            user = User.query.get(current_user_id)
+            if user:
+                return user.to_dict(), 200
+            else:
+                return {'message': 'User not found'}, 404

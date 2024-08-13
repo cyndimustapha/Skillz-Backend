@@ -42,13 +42,13 @@ def get_eat_now():
     return datetime.now(EAT)
 
 # Import models and resources
-# from models import User, Course, CourseContent, Payment, Enrollment, Review, Message, Accolade
 from Resources import (
     MessageResource,
     SignInResource,
     SignUpResource,
     SignOutResource,
     UsersInConversationResource,
+    UserResource,
     CourseResource,
     CourseContentResource,
     ReviewResource,
@@ -64,6 +64,7 @@ api.add_resource(SignUpResource, '/sign-up')
 api.add_resource(SignInResource, '/sign-in')
 api.add_resource(SignOutResource, '/sign-out')
 api.add_resource(UsersInConversationResource, '/users/conversations')
+api.add_resource(UserResource, '/users', '/users/<int:user_id>')
 api.add_resource(CourseResource, '/courses', '/courses/<int:course_id>')
 api.add_resource(CourseContentResource, '/coursecontents', '/coursecontents/<int:content_id>')
 # api.add_resource(PaymentResource, '/payments')
@@ -71,8 +72,6 @@ api.add_resource(EnrollmentResource, '/enrollments')
 api.add_resource(AccoladeListResource, '/accolades')
 api.add_resource(AccoladeResource, '/accolades/<int:id>')
 api.add_resource(ReviewResource, '/reviews', '/reviews/<int:review_id>')
-
-
 
 @app.before_request
 def handle_preflight():
