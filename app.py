@@ -7,6 +7,10 @@ from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_cors import CORS
 from models import db
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 
 # Initialize extensions
 migrate = Migrate()
@@ -27,6 +31,13 @@ app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'your-email@example.com'
 app.config['MAIL_PASSWORD'] = 'your-email-password'
 app.config['MAIL_DEFAULT_SENDER'] = 'your-email@example.com'
+
+cloudinary.config(
+    cloud_name='dx0dgxzpk',
+    api_key='528686173472686',
+    api_secret='vl_n-rurd_6IJQ-TM_oC8ruukyk'
+)
+
 
 # Initialize extensions
 db.init_app(app)

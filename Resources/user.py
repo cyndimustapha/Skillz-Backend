@@ -5,22 +5,42 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from models import User, Message, db
 from datetime import datetime
 
+from flask import request, jsonify
+from flask_restful import Resource
+from werkzeug.security import generate_password_hash
+import cloudinary.uploader
+from models import User, db
+
 class SignUpResource(Resource):
     def post(self):
-        data = request.get_json()
+        data = request.form  # Use form to handle file uploads
         first_name = data.get('firstName')
         last_name = data.get('lastName')
         role = data.get('role')
         email = data.get('email')
         password = data.get('password')
-        profile_picture = data.get('profilePicture')
         bio = data.get('bio')
         verified = data.get('verified', False)
+
+        # Convert 'verified' to a boolean if it is provided as a string
+        if isinstance(verified, str):
+            verified = verified.lower() in ['true', '1', 'yes']
+        elif not isinstance(verified, bool):
+            verified = False
+
+        print(f"Verified value: {verified}, Type: {type(verified)}")  # Debugging
+
+        profile_picture = request.files.get('profilePicture')  # Get the uploaded file
 
         if User.query.filter_by(email=email).first():
             return {'message': 'Email is already registered'}, 400
 
-        # Use 'pbkdf2:sha256' for password hashing
+        # Handle the profile picture upload if present
+        profile_picture_url = None
+        if profile_picture:
+            upload_result = cloudinary.uploader.upload(profile_picture)
+            profile_picture_url = upload_result.get('secure_url')
+
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
         new_user = User(
@@ -29,7 +49,7 @@ class SignUpResource(Resource):
             role=role,
             email=email,
             password=hashed_password,
-            profile_picture=profile_picture,
+            profile_picture=profile_picture_url,
             bio=bio,
             verified=verified
         )
@@ -38,6 +58,7 @@ class SignUpResource(Resource):
         db.session.commit()
 
         return {'message': 'Registration successful'}, 201
+
 
 class SignInResource(Resource):
     def post(self):
