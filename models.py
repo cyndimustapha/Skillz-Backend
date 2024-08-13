@@ -78,10 +78,13 @@ class Course(db.Model, SerializerMixin):
             'title': self.title,
             'description': self.description,
             'price': str(self.price) if self.price else None,
-            'image_url': self.image_url, 
+            'image_url': self.image_url,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'instructor': self.user.to_dict() if self.user else None,  
+            'contents': [content.to_dict() for content in self.contents]  
         }
+
 
 class CourseContent(db.Model, SerializerMixin):
     __tablename__ = 'coursecontent'
