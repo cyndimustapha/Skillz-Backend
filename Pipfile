@@ -11,18 +11,13 @@ flask = "*"
 flask-jwt-extended = "*"
 flasgger = "*"
 sqlalchemy-serializer = "*"
-datetime = "*"
 flask-migrate = "*"
 flask-cors = "*"
-flask-migrate = "*"
-sqlalchemy = "*"
-flask-sqlalchemy = "*"
-flask = "*"
 flask-serialize = "*"
-sqlalchemy-serializer = "*"
-flask-restful = "*"
+serializer = "*"
+requests = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
