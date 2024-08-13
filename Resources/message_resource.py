@@ -18,7 +18,7 @@ class MessageResource(Resource):
             content = data.get('content')
 
             if not receiver_id or not content:
-                return jsonify({"error": "Receiver ID and content are required"}), 400
+                return {"error": "Receiver ID and content are required"}, 400
 
             message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content)
             db.session.add(message)
@@ -27,11 +27,11 @@ class MessageResource(Resource):
             response_data = {"message": "Message sent successfully", "data": message.to_dict()}
             logging.debug(f"Sending response: {response_data}")
 
-            return jsonify(response_data), 201
+            return response_data, 201
 
         except Exception as e:
             logging.error(f"Error: {e}", exc_info=True)
-            return jsonify({"error": "Internal Server Error"}), 500
+            return {"error": "Internal Server Error"}, 500
         
     @jwt_required()
     def get(self):
@@ -46,7 +46,8 @@ class MessageResource(Resource):
                 ).order_by(Message.sent_at.asc()).all()
 
                 message_list = [message.to_dict() for message in messages]
-                return jsonify(message_list), 200
+                logging.debug(f"Messages retrieved: {message_list}")
+                return message_list, 200
 
             else:
                 conversations = db.session.query(User).filter(
@@ -54,8 +55,9 @@ class MessageResource(Resource):
                 ).distinct().all()
 
                 conversation_list = [user.to_dict() for user in conversations]
-                return jsonify(conversation_list), 200
+                logging.debug(f"Conversations retrieved: {conversation_list}")
+                return conversation_list, 200
 
         except Exception as e:
             logging.error(f"Error: {e}", exc_info=True)
-            return jsonify({"error": "Internal Server Error"}), 500   
+            return {"error": "Internal Server Error"}, 500

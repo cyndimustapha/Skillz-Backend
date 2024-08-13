@@ -89,3 +89,4 @@ class UsersInConversationResource(Resource):
         users_list = [user.to_dict() for user in users]
 
         return jsonify(users_list)
+    
