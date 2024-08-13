@@ -43,10 +43,11 @@ def seed_database():
         db.session.commit()
 
         # Create sample courses
+        categories = ['Cooking', 'Tech', 'Human Relations', 'AI', 'Business', 'Art', 'Science']
         courses = []
         for i in range(15):  # Create 15 courses
            instructor = fake.random_element(elements=[user for user in users if user.role == 'instructor'])
-                                                
+           category = fake.random_element(categories)  # Randomly select a category                                    
            image_url = f'https://images.pexels.com/photos/459403/pexels-photo-459403.jpeg?auto=compress&cs=tinysrgb&w={1260 + i}&h={750 + i}&dpr=1' 
 
            course = Course(
@@ -55,6 +56,7 @@ def seed_database():
                description=fake.paragraph(nb_sentences=3),
                price=fake.random_number(digits=3),
                image_url=image_url,  # Unique placeholder course image
+               category=category,
                created_at=get_eat_now(),
                updated_at=get_eat_now()
            )
@@ -62,7 +64,6 @@ def seed_database():
 
         db.session.add_all(courses)
         db.session.commit()
-
 
         # Create sample course content
         course_contents = []

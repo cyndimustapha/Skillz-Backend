@@ -63,6 +63,7 @@ class Course(db.Model, SerializerMixin):
     description = db.Column(db.Text)
     price = db.Column(db.DECIMAL(10, 2))
     image_url = db.Column(db.String(255)) 
+    category = db.Column(db.String(100))
     created_at = db.Column(db.TIMESTAMP, default=get_eat_now)
     updated_at = db.Column(db.TIMESTAMP, default=get_eat_now, onupdate=get_eat_now)
 
@@ -79,11 +80,14 @@ class Course(db.Model, SerializerMixin):
             'description': self.description,
             'price': str(self.price) if self.price else None,
             'image_url': self.image_url,
+            'category': self.category,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'instructor': self.user.to_dict() if self.user else None,  
-            'contents': [content.to_dict() for content in self.contents]  
+            'contents': [content.to_dict() for content in self.contents], 
+            'reviews': [review.to_dict() for review in self.reviews]
         }
+
 
 
 class CourseContent(db.Model, SerializerMixin):
