@@ -49,7 +49,7 @@ class SignUpResource(Resource):
         db.session.commit()
 
         # Send verification email
-        verification_link = f"http://yourdomain.com/verify/{verification_token}"
+        verification_link = f"http://127.0.0.1:5000/verify/{verification_token}"
         msg = MailMessage("Verify Your Email", sender="your-email@example.com", recipients=[email])
         msg.body = f"Please click the following link to verify your email: {verification_link}"
         mail.send(msg)
