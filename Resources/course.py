@@ -21,7 +21,7 @@ class CourseResource(Resource):
             description=data['description'],
             price=data['price'],
             image_url=data['image_url'],
-            category=data.get('category')
+            category=data('category')
         )
         db.session.add(new_course)
         db.session.commit()
