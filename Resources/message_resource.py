@@ -58,4 +58,4 @@ class MessageResource(Resource):
 
         except Exception as e:
             logging.error(f"Error: {e}", exc_info=True)
-            return jsonify({"error": "Internal Server Error"}), 500
+            return jsonify({"error": "Internal Server Error"}), 500   
