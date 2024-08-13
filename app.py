@@ -120,7 +120,8 @@ from Resources import (
     AccoladeResource, 
     AccoladeListResource,
     Verify2FAResource,
-    VerifyEmailResource
+    VerifyEmailResource,
+    UserProfileResource,
 )
 
 # Register API resources
@@ -138,6 +139,8 @@ api.add_resource(AccoladeResource, '/accolades/<int:id>')
 api.add_resource(ReviewResource, '/reviews', '/reviews/<int:review_id>')
 api.add_resource(VerifyEmailResource, '/verify/<string:token>')
 api.add_resource(Verify2FAResource, '/verify-2fa')
+api.add_resource(UserProfileResource, '/user/profile')
+
 
 
 # Create tables and run the application

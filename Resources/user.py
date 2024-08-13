@@ -162,3 +162,27 @@ def send_email(to_email, subject, content):
     except Exception as e:
         print(f"Error sending email: {e}")
         return False
+
+
+class UserProfileResource(Resource):
+    @jwt_required()
+    def get(self):
+        # Get the current user's ID from the JWT token
+        current_user_id = get_jwt_identity()
+
+        # Fetch the user from the database
+        user = User.query.filter_by(id=current_user_id).first()
+
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        # Return the user profile data
+        return {
+            'id': user.id,
+            'role': user.role,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'profile_picture': user.profile_picture,
+            'bio': user.bio,
+        }, 200
