@@ -4,6 +4,9 @@ from .user import SignInResource
 from .user import SignUpResource
 from .user import SignOutResource
 from .user import UsersInConversationResource
+from .user import Verify2FAResource
+from .user import VerifyEmailResource
+from .user import UserProfileResource
 from .course import CourseResource
 from .course_content import CourseContentResource
 from .payment import PaymentResource
@@ -24,5 +27,9 @@ __all__ = [
     'ReviewResource',
     'MessageResource',
     'AccoladeResource',
-    'AccoladeListResource'
+    'AccoladeListResource',
+    'Verify2FAResource', 
+    'VerifyEmailResource',
+    'UserProfileResource',
+
 ]
