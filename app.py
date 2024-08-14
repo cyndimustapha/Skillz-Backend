@@ -27,9 +27,9 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'marrencyndi101@gmail.com')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'tjyd osot iqcd wcwu')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'marrencyndi101@gmail.com')
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'skillzgroup41@gmail.com')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'bpyk njqd znuo qhkv')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'skillzgroup41@gmail.com')
 
 # Initialize extensions
 db.init_app(app)
