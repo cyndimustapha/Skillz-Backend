@@ -21,7 +21,7 @@ __all__ = [
     'SignInResource',
     'SignOutResource',
     'UsersInConversationResource',
-    'UserResorce',
+    'UserResource',
     'CourseResource',
     'CourseContentResource',
     # 'PaymentResource',
@@ -32,6 +32,6 @@ __all__ = [
     'AccoladeListResource',
     'Verify2FAResource', 
     'VerifyEmailResource',
-    'UserProfileResource',
+    
 
 ]

@@ -27,8 +27,11 @@ class SignUpResource(Resource):
         profile_picture = request.files.get('profilePicture')
         profile_picture_url = None
         if profile_picture:
-            upload_result = cloudinary.uploader.upload(profile_picture)
-            profile_picture_url = upload_result.get('secure_url')
+            try:
+                upload_result = cloudinary.uploader.upload(profile_picture)
+                profile_picture_url = upload_result.get('secure_url')
+            except Exception as e:
+                return {'message': f'Profile picture upload failed: {e}'}, 500
 
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         verification_token = str(uuid.uuid4())
@@ -44,14 +47,21 @@ class SignUpResource(Resource):
             verification_token=verification_token
         )
 
-        db.session.add(new_user)
-        db.session.commit()
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return {'message': f'Failed to create user: {e}'}, 500
 
         # Send verification email
         verification_link = f"http://127.0.0.1:5000/verify/{verification_token}"
         msg = MailMessage("Verify Your Email", sender="your-email@example.com", recipients=[email])
         msg.body = f"Please click the following link to verify your email: {verification_link}"
-        mail.send(msg)
+        try:
+            mail.send(msg)
+        except Exception as e:
+            return {'message': f'Failed to send verification email: {e}'}, 500
 
         return {'message': 'Registration successful. Please check your email to verify your account.'}, 201
 
@@ -65,6 +75,7 @@ class VerifyEmailResource(Resource):
             return {'message': 'Email verified successfully'}, 200
         else:
             return {'message': 'Invalid or expired token'}, 400
+
 class SignInResource(Resource):
     def post(self):
         data = request.get_json()
@@ -94,7 +105,6 @@ class SignInResource(Resource):
             return {'message': 'Failed to send 2FA code'}, 500
         
         return {'message': 'Invalid credentials'}, 401
-
 
 class Verify2FAResource(Resource):
     def post(self):
@@ -126,23 +136,19 @@ class SignOutResource(Resource):
 class UsersInConversationResource(Resource):
     @jwt_required()
     def get(self):
-        # Get the current user's ID from JWT
         current_user_id = get_jwt_identity()
         if not isinstance(current_user_id, int):
             return jsonify({"error": "Invalid user ID format"}), 400
 
-        # Retrieve all messages involving the current user
         received_messages = Message.query.filter_by(receiver_id=current_user_id).all()
         sent_messages = Message.query.filter_by(sender_id=current_user_id).all()
 
-        # Collect user IDs from the messages
         user_ids = set(
             [msg.sender_id for msg in received_messages] +
             [msg.receiver_id for msg in sent_messages]
         )
-        user_ids.discard(current_user_id)  # Remove the current user from the list
+        user_ids.discard(current_user_id)
 
-        # Fetch user details for the collected user IDs
         users = User.query.filter(User.id.in_(user_ids)).all()
         users_list = [user.to_dict() for user in users]
 
@@ -151,16 +157,13 @@ class UsersInConversationResource(Resource):
 class UserResource(Resource):
     @jwt_required()
     def get(self):
-        # Get the current user's ID from the JWT token
         current_user_id = get_jwt_identity()
 
-        # Fetch the user from the database
         user = User.query.filter_by(id=current_user_id).first()
 
         if not user:
             return {'message': 'User not found'}, 404
 
-        # Return the user profile data
         return {
             'id': user.id,
             'role': user.role,
@@ -170,3 +173,9 @@ class UserResource(Resource):
             'profile_picture': user.profile_picture,
             'bio': user.bio,
         }, 200
+class AllUsersResource(Resource):
+    @jwt_required()
+    def get(self):
+        users = User.query.all()
+        users_list = [user.to_dict() for user in users]  # Assuming User model has a to_dict() method
+        return jsonify(users_list), 200
