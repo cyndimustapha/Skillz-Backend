@@ -84,12 +84,12 @@ class SignInResource(Resource):
             otp = generate_otp()
             otp_store[email] = {
                 'otp': otp,
-                'expiry': datetime.now() + timedelta(minutes=5)  # OTP expires in 5 minutes
+                'expiry': datetime.now() + timedelta(minutes=15)  # OTP expires in 5 minutes
             }
 
             # Send OTP to the user's email
             subject = "Your 2FA Code"
-            content = f"Your 2FA code is {otp}. It will expire in 5 minutes."
+            content = f"Your 2FA code is {otp}. It will expire in 15 minutes."
             if send_email(email, subject, content):
                 return {'message': 'Please verify your 2FA code sent to your email'}, 200
 

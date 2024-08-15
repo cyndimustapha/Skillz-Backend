@@ -9,9 +9,9 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_mail import Mail, Message
 from flask_cors import CORS
 from models import db, User, Message
-#import cloudinary
-#import cloudinary.uploader
-#import cloudinary.api
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 import uuid
 import os
 
@@ -119,7 +119,11 @@ from Resources import (
     EnrollmentResource,
     AccoladeResource, 
     AccoladeListResource,
-    PaymentResource
+    PaymentResource,
+    VerifyEmailResource,
+    Verify2FAResource,
+    UserProfileResource
+
 )
 
 # Register API resources

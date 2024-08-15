@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-#import requests
+import requests
 import base64
 from datetime import datetime
 from flask_restful import Resource
