@@ -9,8 +9,12 @@ class CourseResource(Resource):
             course = Course.query.get_or_404(course_id)
             return course.to_dict(), 200
         else:
-            # Get all courses
-            courses = Course.query.all()
+            # Get all courses or filter by instructor_id
+            instructor_id = request.args.get('instructor_id')
+            if instructor_id:
+                courses = Course.query.filter_by(instructor_id=instructor_id).all()
+            else:
+                courses = Course.query.all()
             return [course.to_dict() for course in courses], 200
 
     def post(self):
@@ -21,7 +25,7 @@ class CourseResource(Resource):
             description=data['description'],
             price=data['price'],
             image_url=data['image_url'],
-            category=data('category')
+            category=data.get('category')  # Use .get() to avoid KeyError
         )
         db.session.add(new_course)
         db.session.commit()
