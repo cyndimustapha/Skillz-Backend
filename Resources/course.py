@@ -1,6 +1,8 @@
 from flask import request, jsonify
 from flask_restful import Resource
 from models import Course, db
+import cloudinary
+import cloudinary.uploader
 
 class CourseResource(Resource):
     def get(self, course_id=None):
@@ -19,13 +21,23 @@ class CourseResource(Resource):
 
     def post(self):
         data = request.get_json()
+        image_file = request.files.get('file')  # Ensure this key matches the key used in FormData
+
+        image_url = None
+        if image_file:
+            try:
+                upload_result = cloudinary.uploader.upload(image_file)
+                image_url = upload_result.get('secure_url')
+            except Exception as e:
+                return {'message': f'Error uploading image: {str(e)}'}, 500
+
         new_course = Course(
             instructor_id=data['instructor_id'],
             title=data['title'],
             description=data['description'],
             price=data['price'],
-            image_url=data['image_url'],
-            category=data.get('category')  # Use .get() to avoid KeyError
+            image_url=image_url,  
+            category=data.get('category') 
         )
         db.session.add(new_course)
         db.session.commit()
