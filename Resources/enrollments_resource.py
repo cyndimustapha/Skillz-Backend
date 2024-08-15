@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from models import Enrollment,db
+from models import Enrollment, db
 
 class EnrollmentResource(Resource):
     def get(self, enrollment_id=None):
@@ -8,7 +8,10 @@ class EnrollmentResource(Resource):
             enrollment = Enrollment.query.get_or_404(enrollment_id)
             return enrollment.to_dict(), 200
         else:
-            enrollments = Enrollment.query.filter_by(learner_id=request.args.get('learner_id')).all()
+            learner_id = request.args.get('learner_id')
+            if not learner_id:
+                return {'message': 'learner_id is required'}, 400
+            enrollments = Enrollment.query.filter_by(learner_id=learner_id).all()
             return [enrollment.to_dict() for enrollment in enrollments], 200
 
     def post(self):

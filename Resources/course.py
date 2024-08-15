@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_restful import Resource
-from models import Course, db
+from models import Course, Enrollment, db
 import cloudinary
 import cloudinary.uploader
 
@@ -11,17 +11,31 @@ class CourseResource(Resource):
             course = Course.query.get_or_404(course_id)
             return course.to_dict(), 200
         else:
-            # Get all courses or filter by instructor_id
+            # Check if we need to get courses by instructor_id or learner_id
             instructor_id = request.args.get('instructor_id')
+            learner_id = request.args.get('learner_id')
             if instructor_id:
                 courses = Course.query.filter_by(instructor_id=instructor_id).all()
+                if not courses:
+                    return {'message': 'No courses found for this instructor'}, 404
+            elif learner_id:
+                # Get all course IDs the learner is enrolled in
+                enrollments = Enrollment.query.filter_by(learner_id=learner_id).all()
+                course_ids = [enrollment.course_id for enrollment in enrollments]
+                courses = Course.query.filter(Course.id.in_(course_ids)).all()
+                if not courses:
+                    return {'message': 'No courses found for this learner'}, 404
             else:
                 courses = Course.query.all()
             return [course.to_dict() for course in courses], 200
 
     def post(self):
         data = request.get_json()
-        image_file = request.files.get('file')  # Ensure this key matches the key used in FormData
+        image_file = request.files.get('file') 
+
+        # Validate input data
+        if not all(key in data for key in ['instructor_id', 'title', 'description', 'price']):
+            return {'message': 'Missing required fields'}, 400
 
         image_url = None
         if image_file:
