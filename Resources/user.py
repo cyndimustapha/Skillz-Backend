@@ -7,9 +7,8 @@ from datetime import datetime, timedelta
 import cloudinary.uploader
 import uuid
 from flask_mail import Message as MailMessage
-from app import mail
+from app import generate_otp, mail, send_email
 
-# In-memory storage for OTP (use a persistent storage in production)
 otp_store = {}
 
 class SignUpResource(Resource):
@@ -66,7 +65,6 @@ class VerifyEmailResource(Resource):
             return {'message': 'Email verified successfully'}, 200
         else:
             return {'message': 'Invalid or expired token'}, 400
-
 class SignInResource(Resource):
     def post(self):
         data = request.get_json()
@@ -90,12 +88,13 @@ class SignInResource(Resource):
             # Send OTP to the user's email
             subject = "Your 2FA Code"
             content = f"Your 2FA code is {otp}. It will expire in 5 minutes."
-            if send_email(email, subject, content):
+            if send_email(mail, email, subject, content):  # Pass 'mail' here
                 return {'message': 'Please verify your 2FA code sent to your email'}, 200
 
             return {'message': 'Failed to send 2FA code'}, 500
         
         return {'message': 'Invalid credentials'}, 401
+
 
 class Verify2FAResource(Resource):
     def post(self):
@@ -149,22 +148,7 @@ class UsersInConversationResource(Resource):
 
         return jsonify(users_list)
 
-def generate_otp():
-    import random
-    import string
-    return ''.join(random.choices(string.digits, k=6))
-
-def send_email(to_email, subject, content):
-    msg = MailMessage(subject=subject, recipients=[to_email], body=content)
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        print(f"Error sending email: {e}")
-        return False
-
-
-class UserProfileResource(Resource):
+class UserResource(Resource):
     @jwt_required()
     def get(self):
         # Get the current user's ID from the JWT token

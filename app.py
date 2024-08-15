@@ -1,19 +1,21 @@
+import os
 import random
 import string
-from flask import Flask, jsonify, make_response, request
-from flask_migrate import Migrate
-from flask_restful import Api, Resource
 from datetime import datetime, timedelta
-import pytz
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from flask_mail import Mail, Message
+
+from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
-from models import db, User, Message
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_mail import Mail, Message as MailMessage
+from flask_migrate import Migrate
+from flask_restful import Api
+
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-import uuid
-import os
+import pytz
+
+from models import db, User, Message
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -44,59 +46,29 @@ cloudinary.config(
     api_secret=os.getenv('CLOUDINARY_API_SECRET', 'vl_n-rurd_6IJQ-TM_oC8ruukyk')
 )
 
+# In-memory storage for OTP (use a persistent storage in production)
+otp_store = {}
+
 # Define East African Time timezone
 EAT = pytz.timezone('Africa/Nairobi')
 
 def get_eat_now():
     return datetime.now(EAT)
 
-# Generate and send 2FA code
+# Utility functions
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
-def send_email(to_email, subject, content):
-    msg = Message(subject=subject, recipients=[to_email], body=content)
+def send_email(mail, to_email, subject, content):
+    msg = MailMessage(subject=subject, recipients=[to_email], body=content)
     try:
         mail.send(msg)
         return True
     except Exception as e:
         print(f"Error sending email: {e}")
         return False
-
-@app.route('/send-2fa', methods=['POST'])
-def send_2fa():
-    email = request.json.get('email')
-    if email:
-        otp = generate_otp()
-        otp_store[email] = {
-            'otp': otp,
-            'expiry': datetime.now() + timedelta(minutes=5)  # OTP expires in 5 minutes
-        }
-        subject = "Your 2FA Code"
-        content = f"Your 2FA code is {otp}. It will expire in 5 minutes."
-        if send_email(email, subject, content):
-            return jsonify({'message': '2FA code sent to email'}), 200
-        return jsonify({'message': 'Failed to send email'}), 500
-    return jsonify({'message': 'Email is required'}), 400
-
-@app.route('/verify-2fa', methods=['POST'])
-def verify_2fa():
-    email = request.json.get('email')
-    otp = request.json.get('otp')
-    if email in otp_store:
-        stored_otp = otp_store[email]['otp']
-        expiry = otp_store[email]['expiry']
-        if datetime.now() > expiry:
-            return jsonify({'message': 'OTP expired'}), 400
-        if otp == stored_otp:
-            del otp_store[email]  # Remove OTP after successful verification
-            return jsonify({'message': 'OTP verified'}), 200
-        return jsonify({'message': 'Invalid OTP'}), 400
-    return jsonify({'message': 'No OTP found for email'}), 400
-
-# In-memory storage for simplicity
-otp_store = {}
-
+    
+# Handle CORS preflight requests
 @app.before_request
 def handle_preflight():
     if request.method == 'OPTIONS':
@@ -122,7 +94,7 @@ from Resources import (
     AccoladeListResource,
     Verify2FAResource,
     VerifyEmailResource,
-    UserProfileResource,
+    
 )
 
 # Register API resources
@@ -141,8 +113,6 @@ api.add_resource(AccoladeResource, '/accolades/<int:id>')
 api.add_resource(ReviewResource, '/reviews', '/reviews/<int:review_id>')
 api.add_resource(VerifyEmailResource, '/verify/<string:token>')
 api.add_resource(Verify2FAResource, '/verify-2fa')
-api.add_resource(UserProfileResource, '/user/profile')
-
 
 
 # Create tables and run the application
