@@ -86,8 +86,8 @@ class SignInResource(Resource):
             }
 
             # Send OTP to the user's email
-            subject = "Your 2FA Code"
-            content = f"Your 2FA code is {otp}. It will expire in 5 minutes."
+            subject = "Verification Code"
+            content = f"Your verification code is {otp}. It will expire in 5 minutes."
             if send_email(mail, email, subject, content):  # Pass 'mail' here
                 return {'message': 'Please verify your 2FA code sent to your email'}, 200
 
