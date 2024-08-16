@@ -10,7 +10,7 @@ from .user import Verify2FAResource
 from .user import VerifyEmailResource
 from .course import CourseResource
 from .course_content import CourseContentResource
-#from .payment_resource import PaymentResource
+from .payment import PaymentResource
 from .enrollments_resource import EnrollmentResource
 from .reviews import ReviewResource
 from .message_resource import MessageResource
@@ -27,7 +27,7 @@ __all__ = [
     'AllUsersResource',
     'CourseResource',
     'CourseContentResource',
-    # 'PaymentResource',
+    'PaymentResource',
     'EnrollmentResource',
     'ReviewResource',
     'MessageResource',
