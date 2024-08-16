@@ -42,8 +42,8 @@ class User(db.Model):
     received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
     payments = db.relationship('Payment', backref='learner', lazy=True)
 
-    def to_dict(self):
-        return {
+    def to_dict(self, include_courses=False):
+        user_dict = {
             'id': self.id,
             'role': self.role,
             'first_name': self.first_name,
@@ -56,6 +56,12 @@ class User(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'last_sign_in': self.last_sign_in.isoformat() if self.last_sign_in else None,
         }
+
+        if include_courses:
+            user_dict['courses'] = [course.to_dict() for course in self.courses]
+
+        return user_dict
+
 
 class Course(db.Model, SerializerMixin):
     __tablename__ = 'courses'
