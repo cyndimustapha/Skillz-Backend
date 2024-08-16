@@ -7,7 +7,9 @@ from datetime import datetime, timedelta
 import cloudinary.uploader
 import uuid
 from flask_mail import Message as MailMessage
-from app import generate_otp, mail, send_email
+# from app import generate_otp, mail, send_email
+from utlis import generate_otp, send_email
+
 
 otp_store = {}
 

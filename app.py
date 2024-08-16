@@ -15,7 +15,7 @@ import cloudinary.uploader
 import cloudinary.api
 import pytz
 
-from models import db, User, Message
+from models import db
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -55,18 +55,18 @@ EAT = pytz.timezone('Africa/Nairobi')
 def get_eat_now():
     return datetime.now(EAT)
 
-# Utility functions
-def generate_otp():
-    return ''.join(random.choices(string.digits, k=6))
+# # Utility functions
+# def generate_otp():
+#     return ''.join(random.choices(string.digits, k=6))
 
-def send_email(mail, to_email, subject, content):
-    msg = MailMessage(subject=subject, recipients=[to_email], body=content)
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        print(f"Error sending email: {e}")
-        return False
+# def send_email(mail, to_email, subject, content):
+#     msg = MailMessage(subject=subject, recipients=[to_email], body=content)
+#     try:
+#         mail.send(msg)
+#         return True
+#     except Exception as e:
+#         print(f"Error sending email: {e}")
+#         return False
     
 # Handle CORS preflight requests
 @app.before_request

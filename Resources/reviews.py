@@ -30,3 +30,8 @@ class ReviewResource(Resource):
         db.session.delete(review)
         db.session.commit()
         return {'message': 'Review deleted'}, 200
+    
+
+
+
+    
