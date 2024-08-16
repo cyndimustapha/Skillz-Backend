@@ -12,26 +12,28 @@ class CourseResource(Resource):
         else:
             instructor_id = request.args.get('instructor_id')
             learner_id = request.args.get('learner_id')
-        if instructor_id:
-            courses = Course.query.filter_by(instructor_id=instructor_id).all()
-            # Return an empty list if no courses are found
-            return [course.to_dict() for course in courses], 200
-        elif learner_id:
-            enrollments = Enrollment.query.filter_by(learner_id=learner_id).all()
-            course_ids = [enrollment.course_id for enrollment in enrollments]
-            courses = Course.query.filter(Course.id.in_(course_ids)).all()
-            # Return an empty list if no courses are found
-            return [course.to_dict() for course in courses], 200
-        else:
-            courses = Course.query.all()
-        return [course.to_dict() for course in courses], 200
-    
+            if instructor_id:
+                courses = Course.query.filter_by(instructor_id=instructor_id).all()
+                return [course.to_dict() for course in courses], 200
+            elif learner_id:
+                enrollments = Enrollment.query.filter_by(learner_id=learner_id).all()
+                course_ids = [enrollment.course_id for enrollment in enrollments]
+                courses = Course.query.filter(Course.id.in_(course_ids)).all()
+                return [course.to_dict() for course in courses], 200
+            else:
+                courses = Course.query.all()
+                return [course.to_dict() for course in courses], 200
+
     def post(self):
-        data = request.get_json()
-        image_file = request.files.get('file') 
+        title = request.form.get('title')
+        description = request.form.get('description')
+        price = request.form.get('price')
+        instructor_id = request.form.get('instructor_id')
+        category = request.form.get('category')
+        image_file = request.files.get('file')
 
         # Validate input data
-        if not all(key in data for key in ['instructor_id', 'title', 'description', 'price']):
+        if not all([title, description, price, instructor_id]):
             return {'message': 'Missing required fields'}, 400
 
         image_url = None
@@ -39,19 +41,27 @@ class CourseResource(Resource):
             try:
                 upload_result = cloudinary.uploader.upload(image_file)
                 image_url = upload_result.get('secure_url')
+                print(f'Image uploaded: {image_url}')
             except Exception as e:
                 return {'message': f'Error uploading image: {str(e)}'}, 500
 
         new_course = Course(
-            instructor_id=data['instructor_id'],
-            title=data['title'],
-            description=data['description'],
-            price=data['price'],
-            image_url=image_url,  
-            category=data.get('category') 
+            instructor_id=instructor_id,
+            title=title,
+            description=description,
+            price=price,
+            image_url=image_url,
+            category=category
         )
-        db.session.add(new_course)
-        db.session.commit()
+
+        try:
+            db.session.add(new_course)
+            db.session.commit()
+            print(f'Course saved with image_url: {image_url}')
+        except Exception as e:
+            db.session.rollback()
+            return {'message': f'Error saving course: {str(e)}'}, 500
+
         return new_course.to_dict(), 201
 
     def delete(self, course_id):
