@@ -166,15 +166,9 @@ class UserResource(Resource):
         if not user:
             return {'message': 'User not found'}, 404
 
-        return {
-            'id': user.id,
-            'role': user.role,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email,
-            'profile_picture': user.profile_picture,
-            'bio': user.bio,
-        }, 200
+        # Fetch the user and include their courses
+        return user.to_dict(include_courses=True), 200
+
 
 
 class AllUsersResource(Resource):
@@ -223,3 +217,13 @@ class EditUserResource(Resource):
             return {'message': f'Failed to update user: {e}'}, 500
 
         return {'message': 'User details updated successfully'}, 200
+
+class PublicUserResource(Resource):
+    def get(self, user_id):
+        user = User.query.filter_by(id=user_id).first()
+        
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        # Return user details without authentication
+        return user.to_dict(include_courses=True), 200
