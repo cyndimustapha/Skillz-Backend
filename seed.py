@@ -103,7 +103,7 @@ def seed_database():
             Course(
                 instructor_id=users[1].id,  # Bob
                 title='AI for Beginners',
-                description='https://repository-images.githubusercontent.com/344190478/ff93f741-7b50-4bed-af79-e66bf033e9a4.',
+                description='Learn the basics of AI, and all AI tools.',
                 price=100,
                 image_url='https://example.com/images/ai-course.jpg',
                 category='AI',
@@ -171,7 +171,7 @@ def seed_database():
                 updated_at=get_eat_now()
             ),
             Course(
-                instructor_id=users[2].id,  # Carol
+                instructor_id=users[1].id,  # Bob
                 title='Healthy Cooking: Low-Carb Recipes',
                 description='Learn how to cook delicious low-carb meals for a healthier lifestyle.',
                 price=80,
