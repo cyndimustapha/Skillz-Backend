@@ -99,7 +99,7 @@ from Resources import (
     PaymentResource
 )
 
-# Register API resources
+
 api = Api(app)
 api.add_resource(MessageResource, '/messages', '/messages/<int:user_id>')
 api.add_resource(SignUpResource, '/sign-up')

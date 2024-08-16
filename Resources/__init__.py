@@ -6,6 +6,7 @@ from .user import SignOutResource
 from .user import UsersInConversationResource
 from .user import UserResource
 from .user import EditUserResource, AllUsersResource
+from .user import PublicUserResource
 from .user import Verify2FAResource
 from .user import VerifyEmailResource
 from .course import CourseResource
@@ -35,6 +36,7 @@ __all__ = [
     'AccoladeListResource',
     'Verify2FAResource', 
     'VerifyEmailResource',
+    'PublicUserResource'
     
 
 ]
