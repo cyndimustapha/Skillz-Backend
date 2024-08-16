@@ -5,6 +5,7 @@ from .user import SignUpResource
 from .user import SignOutResource
 from .user import UsersInConversationResource
 from .user import UserResource
+from .user import EditUserResource, AllUsersResource
 from .user import Verify2FAResource
 from .user import VerifyEmailResource
 from .course import CourseResource
@@ -22,6 +23,8 @@ __all__ = [
     'SignOutResource',
     'UsersInConversationResource',
     'UserResource',
+    'EditUserResource',
+    'AllUsersResource',
     'CourseResource',
     'CourseContentResource',
     # 'PaymentResource',

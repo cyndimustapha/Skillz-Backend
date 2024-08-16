@@ -173,9 +173,50 @@ class UserResource(Resource):
             'profile_picture': user.profile_picture,
             'bio': user.bio,
         }, 200
+
 class AllUsersResource(Resource):
     @jwt_required()
     def get(self):
+        # No role check required; any logged-in user can access
         users = User.query.all()
-        users_list = [user.to_dict() for user in users]  # Assuming User model has a to_dict() method
-        return jsonify(users_list), 200
+        users_list = [user.to_dict() for user in users]
+
+        return jsonify(users_list)
+
+class EditUserResource(Resource):
+    @jwt_required()
+    def put(self):
+        current_user_id = get_jwt_identity()
+        data = request.get_json()
+
+        user = User.query.filter_by(id=current_user_id).first()
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        # Optional: Validate input data here
+
+        # Update user details
+        if 'first_name' in data:
+            user.first_name = data['first_name']
+        if 'last_name' in data:
+            user.last_name = data['last_name']
+        if 'email' in data:
+            user.email = data['email']
+        if 'bio' in data:
+            user.bio = data['bio']
+        # Handle profile picture upload if included in data
+        if 'profile_picture' in request.files:
+            profile_picture = request.files['profile_picture']
+            try:
+                upload_result = cloudinary.uploader.upload(profile_picture)
+                user.profile_picture = upload_result.get('secure_url')
+            except Exception as e:
+                return {'message': f'Profile picture upload failed: {e}'}, 500
+
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return {'message': f'Failed to update user: {e}'}, 500
+
+        return {'message': 'User details updated successfully'}, 200
