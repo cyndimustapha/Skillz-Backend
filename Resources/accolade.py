@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_restful import Resource
-from models import Accolade,db
+from models import Accolade, db
 
 class AccoladeResource(Resource):
     def get(self, id):
@@ -15,8 +15,10 @@ class AccoladeResource(Resource):
             return {'message': 'Accolade not found'}, 404
         
         data = request.get_json()
-        if 'accolade_type' in data:
-            accolade.accolade_type = data['accolade_type']
+        if 'title' in data:
+            accolade.title = data['title']
+        if 'description' in data:
+            accolade.description = data['description']
         if 'awarded_at' in data:
             accolade.awarded_at = data['awarded_at']
         
@@ -41,7 +43,8 @@ class AccoladeListResource(Resource):
         data = request.get_json()
         new_accolade = Accolade(
             enrollment_id=data['enrollment_id'],
-            accolade_type=data.get('accolade_type'),
+            title=data.get('title'),
+            description=data.get('description'),
             awarded_at=data.get('awarded_at')
         )
         db.session.add(new_accolade)
