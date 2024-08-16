@@ -7,28 +7,25 @@ import cloudinary.uploader
 class CourseResource(Resource):
     def get(self, course_id=None):
         if course_id:
-            # Get a single course by ID
             course = Course.query.get_or_404(course_id)
             return course.to_dict(), 200
         else:
-            # Check if we need to get courses by instructor_id or learner_id
             instructor_id = request.args.get('instructor_id')
             learner_id = request.args.get('learner_id')
-            if instructor_id:
-                courses = Course.query.filter_by(instructor_id=instructor_id).all()
-                if not courses:
-                    return {'message': 'No courses found for this instructor'}, 404
-            elif learner_id:
-                # Get all course IDs the learner is enrolled in
-                enrollments = Enrollment.query.filter_by(learner_id=learner_id).all()
-                course_ids = [enrollment.course_id for enrollment in enrollments]
-                courses = Course.query.filter(Course.id.in_(course_ids)).all()
-                if not courses:
-                    return {'message': 'No courses found for this learner'}, 404
-            else:
-                courses = Course.query.all()
+        if instructor_id:
+            courses = Course.query.filter_by(instructor_id=instructor_id).all()
+            # Return an empty list if no courses are found
             return [course.to_dict() for course in courses], 200
-
+        elif learner_id:
+            enrollments = Enrollment.query.filter_by(learner_id=learner_id).all()
+            course_ids = [enrollment.course_id for enrollment in enrollments]
+            courses = Course.query.filter(Course.id.in_(course_ids)).all()
+            # Return an empty list if no courses are found
+            return [course.to_dict() for course in courses], 200
+        else:
+            courses = Course.query.all()
+        return [course.to_dict() for course in courses], 200
+    
     def post(self):
         data = request.get_json()
         image_file = request.files.get('file') 
