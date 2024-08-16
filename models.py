@@ -196,13 +196,15 @@ class Accolade(db.Model, SerializerMixin):
     __tablename__ = 'accolades'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id'), nullable=False)
-    accolade_type = db.Column(db.String(100))
+    title = db.Column(db.String(20))
+    description = db.Column(db.String(100))
     awarded_at = db.Column(db.TIMESTAMP, default=get_eat_now)
 
     def to_dict(self):
         return {
             'id': self.id,
             'enrollment_id': self.enrollment_id,
-            'accolade_type': self.accolade_type,
+            'title': self.title,
+            'description': self.description,
             'awarded_at': self.awarded_at.isoformat() if self.awarded_at else None,
         }
