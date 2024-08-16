@@ -156,10 +156,12 @@ class UsersInConversationResource(Resource):
 
 class UserResource(Resource):
     @jwt_required()
-    def get(self):
-        current_user_id = get_jwt_identity()
-
-        user = User.query.filter_by(id=current_user_id).first()
+    def get(self, user_id=None):
+        if user_id is None:
+            current_user_id = get_jwt_identity()
+            user = User.query.filter_by(id=current_user_id).first()
+        else:
+            user = User.query.filter_by(id=user_id).first()
 
         if not user:
             return {'message': 'User not found'}, 404
@@ -173,6 +175,7 @@ class UserResource(Resource):
             'profile_picture': user.profile_picture,
             'bio': user.bio,
         }, 200
+
 
 class AllUsersResource(Resource):
     @jwt_required()
