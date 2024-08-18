@@ -359,7 +359,7 @@ def seed_database():
             Message(
                 sender_id=users[0].id,  # Alice
                 receiver_id=users[1].id,  # Bob
-                content='Hi Bob, I’m interested in your AI course. Can you tell me more about it?',
+                content='Hi Cyndi, I’m interested in your AI course. Can you tell me more about it?',
                 sent_at=get_eat_now()
             ),
             Message(
@@ -388,7 +388,7 @@ def seed_database():
         # Create real sample accolades
         accolades = [
             Accolade(
-                enrollment_id=users[1].id,  # Bob  
+                enrollment_id=users[1].id,  # Cyndi 
                 title='Top Instructor of the Month',
                 description='Awarded for exceptional teaching in Python Programming.',
                 awarded_at=get_eat_now()
