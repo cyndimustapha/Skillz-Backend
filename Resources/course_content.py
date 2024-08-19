@@ -4,15 +4,24 @@ from models import CourseContent, db
 
 class CourseContentResource(Resource):
     def get(self, content_id=None):
+        course_id = request.args.get('course_id')
+
         if content_id:
             # Get a single content by ID
             content = CourseContent.query.get_or_404(content_id)
             return content.to_dict(), 200
+        
+        elif course_id:
+            # Get all contents associated with a specific course_id
+            contents = CourseContent.query.filter_by(course_id=course_id).all()
+            return [content.to_dict() for content in contents], 200
+        
         else:
-            # Get all contents
+            # Get all contents if no content_id or course_id is provided
             contents = CourseContent.query.all()
             return [content.to_dict() for content in contents], 200
 
+        
     def post(self):
         data = request.get_json()
         new_content = CourseContent(
